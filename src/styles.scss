@@ -1,1 +1,80 @@
-/* You can add global styles to this file, and also import other style files */
+// /* You can add global styles to this file, and also import other style files */
+
+// // Importa Angular Material y el módulo core para funciones de temas
+// @use '@angular/material' as mat;
+// @use '@angular/material/core' as mat-core;
+
+// // Incluye los estilos base de los componentes (solo una vez)
+// @include mat-core.core();
+
+// // =====================
+// // Tema CLARO
+// // =====================
+
+// // Define las paletas de colores
+// $gestor-recetas-light-primary: mat-core.define-palette(mat-core.$indigo-palette);
+// $gestor-recetas-light-accent: mat-core.define-palette(mat-core.$pink-palette, A200, A100, A400);
+// $gestor-recetas-light-warn: mat-core.define-palette(mat-core.$red-palette);
+
+// // Crea el tema claro
+// $gestor-recetas-light-theme: mat-core.define-light-theme((
+//   color: (
+//     primary: $gestor-recetas-light-primary,
+//     accent: $gestor-recetas-light-accent,
+//     warn: $gestor-recetas-light-warn,
+//   ),
+//   typography: mat-core.define-typography-config(),
+//   density: 0,
+// ));
+
+// // =====================
+// // Tema OSCURO
+// // =====================
+
+// $gestor-recetas-dark-primary: mat-core.define-palette(mat-core.$blue-grey-palette);
+// $gestor-recetas-dark-accent: mat-core.define-palette(mat-core.$amber-palette, A200, A100, A400);
+// $gestor-recetas-dark-warn: mat-core.define-palette(mat-core.$deep-orange-palette);
+
+// $gestor-recetas-dark-theme: mat-core.define-dark-theme((
+//   color: (
+//     primary: $gestor-recetas-dark-primary,
+//     accent: $gestor-recetas-dark-accent,
+//     warn: $gestor-recetas-dark-warn,
+//   ),
+//   typography: mat-core.define-typography-config(),
+// ));
+
+// // =====================
+// // Aplicación de temas
+// // =====================
+
+// // Aplica el tema claro por defecto
+// @include mat.all-component-themes($gestor-recetas-light-theme);
+
+// // Aplica el tema oscuro cuando la clase .dark-theme esté presente
+// .dark-theme {
+//   @include mat.all-component-themes($gestor-recetas-dark-theme);
+
+//   body {
+//     background-color: #303030;
+//     color: #ffffff;
+//   }
+
+//   // Ejemplo de estilos personalizados para componentes en tema oscuro
+//   // .custom-component { background-color: #424242; }
+// }
+
+// // =====================
+// // Estilos globales
+// // =====================
+
+// html, body {
+//   height: 100%;
+//   margin: 0;
+//   font-family: Roboto, "Helvetica Neue", sans-serif;
+// }
+
+// // Puedes activar este estilo si necesitas que los campos se expandan en formularios
+// // .mat-mdc-form-field {
+// //   width: 100%;
+// // }
