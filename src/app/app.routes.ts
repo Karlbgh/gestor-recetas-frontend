@@ -6,7 +6,6 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [
-      // Ruta por defecto o "home" que se muestra dentro de MainLayoutComponent
       {
         path: '',
         redirectTo: 'recetas',
@@ -14,9 +13,28 @@ export const routes: Routes = [
       },
       {
         path: 'recetas',
-        loadComponent: () =>
-          import('./features/recetas/recetas-list.component').then(m => m.RecetasListComponent),
-        // data: { title: 'Lista de Recetas' } // Opcional: para títulos de página
+        children: [
+          {
+            path: '', // Corresponde a /recetas
+            loadComponent: () => import('./features/recetas/recetas-list.component').then(m => m.RecetasListComponent),
+            data: { title: 'Lista de Recetas' }
+          },
+          {
+            path: 'nueva', // Corresponde a /recetas/nueva
+            loadComponent: () => import('./features/recetas/receta-form/receta-form.component').then(m => m.RecetaFormComponent),
+            data: { title: 'Nueva Receta', mode: 'create' }
+          },
+          {
+            path: ':id', // Corresponde a /recetas/:id (detalle)
+            loadComponent: () => import('./features/recetas/receta-detail/receta-detail.component').then(m => m.RecetaDetailComponent),
+            data: { title: 'Detalle de Receta' }
+          },
+          {
+            path: ':id/editar', // Corresponde a /recetas/:id/editar
+            loadComponent: () => import('./features/recetas/receta-form/receta-form.component').then(m => m.RecetaFormComponent),
+            data: { title: 'Editar Receta', mode: 'edit' }
+          }
+        ]
       },
       {
         path: 'ingredientes',
