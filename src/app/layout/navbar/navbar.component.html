@@ -1,0 +1,138 @@
+<nav class="bg-gray-800 text-white shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex-shrink-0">
+        <a routerLink="/" class="text-2xl font-bold hover:text-gray-300">GestorRecetas</a>
+      </div>
+
+      <div class="hidden md:flex flex-grow justify-center px-4">
+        <form (submit)="onSearchSubmit()" class="w-full max-w-md">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <input
+              type="search"
+              [formControl]="searchControl"
+              id="search-recipes"
+              name="search"
+              class="block w-full pl-10 pr-3 py-2 border border-transparent rounded-md leading-5 bg-gray-700 text-gray-300 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-white focus:ring-white focus:text-gray-900 sm:text-sm"
+              placeholder="Buscar recetas..."
+            />
+          </div>
+        </form>
+      </div>
+
+      <div class="hidden md:flex items-center space-x-4">
+        @if (isAuthenticated()) {
+          <button
+            (click)="navigateToProfile()"
+            type="button"
+            class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+          >
+            <span class="mr-2">👤</span> {{ userName() || 'Perfil' }}
+          </button>
+          <button
+            (click)="logout()"
+            type="button"
+            class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+          >
+            Logout
+          </button>
+        } @else {
+          <button
+            (click)="navigateToLogin()"
+            type="button"
+            class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+          >
+            Login
+          </button>
+          <button
+            (click)="navigateToRegister()"
+            type="button"
+            class="bg-indigo-500 hover:bg-indigo-600 px-3 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-indigo-500"
+          >
+            Registrar
+          </button>
+        }
+      </div>
+
+      <div class="md:hidden flex items-center">
+        <button
+          (click)="toggleMobileMenu()"
+          type="button"
+          class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+        >
+          <span class="sr-only">Abrir menú principal</span>
+          @if (!isMobileMenuOpen()) {
+            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          } @else {
+            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (isMobileMenuOpen()) {
+    <div class="md:hidden" id="mobile-menu">
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+        <div class="px-2 pb-2">
+          <form (submit)="onSearchSubmit()" class="w-full">
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <input
+                type="search"
+                [formControl]="searchControl"
+                id="search-recipes-mobile"
+                name="search-mobile"
+                class="block w-full pl-10 pr-3 py-2 border border-transparent rounded-md leading-5 bg-gray-700 text-gray-300 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-white focus:ring-white focus:text-gray-900 sm:text-sm"
+                placeholder="Buscar recetas..."
+              />
+            </div>
+          </form>
+        </div>
+
+        @if (isAuthenticated()) {
+          <a
+            (click)="navigateToProfile()"
+            class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white cursor-pointer"
+          >
+            {{ userName() || 'Perfil' }}
+          </a>
+          <a
+            (click)="logout()"
+            class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white cursor-pointer"
+          >
+            Logout
+          </a>
+        } @else {
+          <a
+            (click)="navigateToLogin()"
+            class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white cursor-pointer"
+          >
+            Login
+          </a>
+          <a
+            (click)="navigateToRegister()"
+            class="block px-3 py-2 rounded-md text-base font-medium text-white bg-indigo-500 hover:bg-indigo-600 cursor-pointer"
+          >
+            Registrar
+          </a>
+        }
+        </div>
+    </div>
+  }
+</nav>
