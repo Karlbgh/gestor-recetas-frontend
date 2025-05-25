@@ -1,76 +1,79 @@
-import { Injectable, signal, effect, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { createClient, SupabaseClient, User, Session } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment'; // Necesitarás supabaseUrl y supabaseKey
-import { Router } from '@angular/router';
+import { Injectable } from '@angular/core';
+import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
+import { environment } from '../../../environments/environment';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private supabase: SupabaseClient;
-  private isBrowser: boolean;
+  private currentUser = new BehaviorSubject<User | null>(null);
+  currentUser$ = this.currentUser.asObservable();
 
-  // Signals para el estado de autenticación
-  public currentUser = signal<User | null>(null);
-  public currentSession = signal<Session | null>(null);
-  public isAuthenticated = signal<boolean>(false);
-
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private router: Router
-  ) {
-    this.isBrowser = isPlatformBrowser(this.platformId);
-    if (!environment.supabaseUrl || !environment.supabaseKey) {
-      throw new Error('Supabase URL and Key must be provided in environment files.');
-    }
+  constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
 
-    if (this.isBrowser) {
-      this.supabase.auth.getSession().then(({ data: { session } }) => {
-        this.currentSession.set(session);
-        this.currentUser.set(session?.user ?? null);
-        this.isAuthenticated.set(!!session);
-      });
-
-      this.supabase.auth.onAuthStateChange((event, session) => {
-        this.currentSession.set(session);
-        this.currentUser.set(session?.user ?? null);
-        this.isAuthenticated.set(!!session);
-
-        if (event === 'SIGNED_IN') {
-          // Opcional: Redirigir después del login
-          // this.router.navigate(['/']);
-        }
-        if (event === 'SIGNED_OUT') {
-          this.router.navigate(['/login']); // O a la página que desees
-        }
-      });
-    }
-  }
-
-  async signInWithEmail(email: string, password: string) {
-    const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    return data;
-  }
-
-  async signUpWithEmail(email: string, password: string, additionalData?: object) {
-    const { data, error } = await this.supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: additionalData // ej. { nombre: 'Usuario' }
+    this.supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        this.currentUser.next(session.user);
+      } else {
+        this.currentUser.next(null);
       }
     });
-    if (error) throw error;
+  }
+
+
+  async signInWithEmail(email: string, password: string) {
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      console.error('Error signing in:', error.message);
+      throw error;
+    }
+    if (data.user) {
+      this.currentUser.next(data.user);
+    }
     return data;
   }
 
   async signOut() {
     const { error } = await this.supabase.auth.signOut();
-    if (error) throw error;
+    if (error) {
+      console.error('Error signing out:', error.message);
+      throw error;
+    }
+    this.currentUser.next(null);
   }
 
-  // ... otros métodos como signInWithOAuth, resetPassword, etc.
+  // ... otros métodos como signUp, resetPassword, getCurrentUser, etc.
+
+  // Método para obtener el cliente de Supabase si necesitas acceder a él desde otros servicios
+  // de una forma controlada (ej. para operaciones de base de datos)
+  getClient(): SupabaseClient {
+    return this.supabase;
+  }
+
+
+  /**
+   * Retrieves the authentication token from localStorage.
+   * @returns The authentication token string if found, otherwise null.
+   */
+  getToken(): string | null {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem('accessToken');
+    }
+    return null; // Retorna null si localStorage no está disponible (e.g., en SSR sin polyfills adecuados)
+  }
+
+    /**
+   * Checks if a token exists in localStorage.
+   * @returns True if a token exists, false otherwise.
+   * @private
+   */
+  private hasToken(): boolean {
+    return !!this.getToken();
+  }
 }
