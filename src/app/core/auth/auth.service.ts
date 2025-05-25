@@ -1,79 +1,79 @@
-import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
-import { environment } from '../../../environments/environment';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal, WritableSignal } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuthService {
-  private supabase: SupabaseClient;
-  private currentUser = new BehaviorSubject<User | null>(null);
-  currentUser$ = this.currentUser.asObservable();
+  // Usamos un WritableSignal para poder cambiar su valor desde el servicio
+  private _isAuthenticated: WritableSignal<boolean> = signal(this.checkInitialAuthStatus());
+  public isAuthenticated = this._isAuthenticated.asReadonly(); // Exponemos como readonly signal
 
-  constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  // Ejemplo: Almacenar un usuario simulado o información del perfil
+  private _currentUser: WritableSignal<any | null> = signal(null);
+  public currentUser = this._currentUser.asReadonly();
 
-    this.supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        this.currentUser.next(session.user);
-      } else {
-        this.currentUser.next(null);
-      }
-    });
+  constructor(private router: Router) {
+    // Puedes cargar el estado de autenticación desde localStorage o una cookie aquí
   }
 
-
-  async signInWithEmail(email: string, password: string) {
-    const { data, error } = await this.supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      console.error('Error signing in:', error.message);
-      throw error;
-    }
-    if (data.user) {
-      this.currentUser.next(data.user);
-    }
-    return data;
-  }
-
-  async signOut() {
-    const { error } = await this.supabase.auth.signOut();
-    if (error) {
-      console.error('Error signing out:', error.message);
-      throw error;
-    }
-    this.currentUser.next(null);
-  }
-
-  // ... otros métodos como signUp, resetPassword, getCurrentUser, etc.
-
-  // Método para obtener el cliente de Supabase si necesitas acceder a él desde otros servicios
-  // de una forma controlada (ej. para operaciones de base de datos)
-  getClient(): SupabaseClient {
-    return this.supabase;
-  }
-
-
-  /**
-   * Retrieves the authentication token from localStorage.
-   * @returns The authentication token string if found, otherwise null.
-   */
-  getToken(): string | null {
+  private checkInitialAuthStatus(): boolean {
+    // Lógica para comprobar si el usuario ya está autenticado al cargar la app
+    // Por ejemplo, revisando localStorage o una cookie.
+    // Esto es solo un placeholder.
     if (typeof localStorage !== 'undefined') {
-      return localStorage.getItem('accessToken');
+      return localStorage.getItem('isLoggedIn') === 'true';
     }
-    return null; // Retorna null si localStorage no está disponible (e.g., en SSR sin polyfills adecuados)
+    return false;
   }
 
-    /**
-   * Checks if a token exists in localStorage.
-   * @returns True if a token exists, false otherwise.
-   * @private
-   */
-  private hasToken(): boolean {
-    return !!this.getToken();
+  login(userData: any): void {
+    // Lógica de login real aquí (ej. llamada a API)
+    // ...
+
+    // Simulando un login exitoso
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('isLoggedIn', 'true');
+    }
+    this._isAuthenticated.set(true);
+    this._currentUser.set({ nombre: 'Usuario Ejemplo', email: userData.email }); // Guardar info del usuario
+    this.router.navigate(['/']); // Redirigir a la página principal o al dashboard
+  }
+
+  register(userData: any): void {
+    // Lógica de registro real aquí (ej. llamada a API)
+    // ...
+
+    // Simulando un registro exitoso y login automático
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('isLoggedIn', 'true');
+    }
+    this._isAuthenticated.set(true);
+    this._currentUser.set({ nombre: 'Nuevo Usuario', email: userData.email });
+    this.router.navigate(['/']);
+  }
+
+  logout(): void {
+    // Lógica de logout real aquí (ej. invalidar token en backend)
+    // ...
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('currentUser'); // Limpiar datos del usuario
+    }
+    this._isAuthenticated.set(false);
+    this._currentUser.set(null);
+    this.router.navigate(['/login']);
+  }
+
+  // Podrías añadir un método para obtener el nombre del usuario para el perfil
+  getUserName(): string | null {
+    const user = this.currentUser();
+    return user ? user.nombre : null;
+  }
+
+  getToken(): string | null {
+    // Aquí podrías implementar la lógica para obtener un token de autenticación
+    // Por ejemplo, desde localStorage o una cookie
+    return localStorage.getItem('authToken');
   }
 }

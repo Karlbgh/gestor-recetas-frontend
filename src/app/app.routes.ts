@@ -7,29 +7,36 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [
-      { path: '', redirectTo: 'recetas', pathMatch: 'full' },
-      { path: 'recetas', loadChildren: () => import('./features/recetas/recetas.routes').then(m => m.RECETAS_ROUTES) },
-      // Ejemplo para ingredientes (si tuvieras ingredientes.routes.ts):
+      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       // {
-      //   path: 'ingredientes',
-      //   loadChildren: () => import('./features/ingredientes/ingredientes.routes').then(m => m.INGREDIENTES_ROUTES),
-      //   // canActivate: [authGuard]
+      //   path: 'inicio',
+      //   loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent) // Ejemplo de página de inicio
       // },
-      // Ejemplo para listas de compras (si tuvieras listas-compras.routes.ts):
       // {
-      //   path: 'listas-compras',
-      //   loadChildren: () => import('./features/listas-compras/listas-compras.routes').then(m => m.LISTAS_COMPRAS_ROUTES),
-      //   // canActivate: [authGuard]
+      //   path: 'recetas',
+      //   loadChildren: () => import('./features/recetas/recetas.routes').then(m => m.RECETAS_ROUTES)
       // },
-      // Ejemplo para planificador (si tuvieras planificador.routes.ts):
+      // // Rutas de autenticación (ejemplo, podrían estar en su propio módulo de rutas)
       // {
-      //   path: 'planificador',
-      //   loadChildren: () => import('./features/planificador/planificador.routes').then(m => m.PLANIFICADOR_ROUTES),
-      //   // canActivate: [authGuard]
+      //   path: 'login',
+      //   loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
       // },
-      // Otras rutas que no requieren autenticación o usan otro layout irían fuera o dentro de otro path '' con otro componente layout
+      // {
+      //   path: 'registro',
+      //   loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent)
+      // },
+      // {
+      //   path: 'perfil',
+      //   loadComponent: () => import('./features/usuarios/perfil/perfil.component').then(m => m.PerfilComponent),
+      //   // canActivate: [AuthGuard] // Proteger ruta de perfil
+      // },
+      // {
+      //   path: 'recetas/buscar', // Ruta para mostrar resultados de búsqueda
+      //   loadComponent: () => import('./features/recetas/pages/receta-search-results/receta-search-results.component').then(m => m.RecetaSearchResultsComponent)
+      // }
     ]
   },
-  // { path: 'login', component: LoginComponent }, // Si tuvieras una ruta de login fuera del layout principal
-  { path: '**', component: NotFoundComponent }
+// Rutas sin layout principal (ej. página de error específica)
+  { path: 'not-found', component: NotFoundComponent },
+  { path: '**', redirectTo: 'not-found' } // Wildcard route para 404
 ];
