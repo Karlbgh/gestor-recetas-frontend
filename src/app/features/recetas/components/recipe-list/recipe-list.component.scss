@@ -1,0 +1,11 @@
+// src/app/features/recetas/components/recipe-list/recipe-list.component.scss
+:host {
+  display: block; // Asegura que el componente ocupa espacio y permite márgenes/padding.
+}
+
+// Si necesitas algún estilo específico para la lista que no sea fácilmente aplicable
+// con Tailwind directamente en el HTML, puedes añadirlo aquí.
+// Por ejemplo, un estilo global para todas las tarjetas dentro de esta lista si fuera necesario.
+// .grid > app-recipe-card {
+//   // Estilos específicos para las tarjetas dentro de este componente de lista
+// }

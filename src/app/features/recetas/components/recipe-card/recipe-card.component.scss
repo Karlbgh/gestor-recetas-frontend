@@ -1,0 +1,26 @@
+// src/app/features/recetas/components/recipe-card/recipe-card.component.scss
+:host {
+  display: flex; // Permite que la tarjeta ocupe la altura completa si está en un grid
+  flex-direction: column;
+  height: 100%; // Asegura que la tarjeta se expanda si el contenedor lo permite
+}
+
+// Opcional: Estilos para line-clamp si no usas el plugin de Tailwind
+// .line-clamp-2 {
+//   overflow: hidden;
+//   display: -webkit-box;
+//   -webkit-box-orient: vertical;
+//   -webkit-line-clamp: 2;
+// }
+
+// .line-clamp-3 {
+//   overflow: hidden;
+//   display: -webkit-box;
+//   -webkit-box-orient: vertical;
+//   -webkit-line-clamp: 3;
+// }
+
+// Ajustes para el ícono de corazón si es necesario (el SVG ya tiene clases de Tailwind)
+// .favorite-icon svg path {
+//   transition: fill 0.2s ease-in-out, stroke 0.2s ease-in-out;
+// }
