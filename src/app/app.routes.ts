@@ -7,11 +7,16 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [
-      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
-      // {
-      //   path: 'inicio',
-      //   loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent) // Ejemplo de página de inicio
-      // },
+      {
+        path: '',
+        redirectTo: 'recetas',
+        pathMatch: 'full',
+      },
+      {
+        path: 'recetas',
+        loadChildren: () => import('./features/recetas/recetas.routes').then( (m) => m.RECETAS_ROUTES ),
+        // canActivate: [authGuard],
+      },
       // {
       //   path: 'recetas',
       //   loadChildren: () => import('./features/recetas/recetas.routes').then(m => m.RECETAS_ROUTES)
@@ -38,5 +43,5 @@ export const routes: Routes = [
   },
 // Rutas sin layout principal (ej. página de error específica)
   { path: 'not-found', component: NotFoundComponent },
-  { path: '**', redirectTo: 'not-found' } // Wildcard route para 404
+  { path: '**', redirectTo: 'not-found' }
 ];

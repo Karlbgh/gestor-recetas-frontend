@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { RecipeListComponent } from './components/recipe-list/recipe-list.component';
 // import { RecetasListComponent } from './recetas-list.component';
 // import { RecetaDetailComponent } from './receta-detail/receta-detail.component';
 // import { RecetaFormComponent } from './receta-form/receta-form.component';
@@ -6,11 +7,11 @@ import { Routes } from '@angular/router';
 // import { AuthGuard } from '../../core/guards/auth.guard';
 
 export const RECETAS_ROUTES: Routes = [
-  // {
-  //   path: '',
-  //   component: RecetasListComponent,
-  //   title: 'Listado de Recetas'
-  // },
+  {
+    path: '', // Esta será la ruta base para la feature de recetas (ej. /recetas)
+    component: RecipeListComponent,
+    title: 'Nuestras Recetas | GestorRecetas' // Título para el navegador
+  },
   // {
   //   path: 'nueva', // Ruta para crear una nueva receta (ej: /recetas/nueva)
   //   component: RecetaFormComponent,

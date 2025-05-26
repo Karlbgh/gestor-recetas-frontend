@@ -1,12 +1,12 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, tap, delay, map } from 'rxjs/operators';
+import { Receta, UsuarioSimple } from '../models/receta.model';
 import { environment } from '../../../../environments/environment';
-import { Receta, RecetaIngrediente } from '../models/receta.model';
 
 @Injectable({
-  providedIn: 'root' // Disponible en toda la aplicación, o puedes proveerlo en el componente/ruta si es específico
+  providedIn: 'root'
 })
 export class RecetaService {
   private http = inject(HttpClient);
@@ -15,9 +15,17 @@ export class RecetaService {
   constructor() { }
 
   // Obtener todas las recetas (con posible paginación o filtros)
-  getRecetas(params?: HttpParams): Observable<Receta[]> {
-    return this.http.get<Receta[]>(this.apiUrl, { params })
-      .pipe(catchError(this.handleError));
+  getRecetas(): Observable<Receta[]> {
+    console.log(`Solicitando recetas desde: ${this.apiUrl}`);
+
+    return this.http.get<Receta[]>(this.apiUrl).pipe(
+      // map(recetas => recetas.map(receta => this.transformarReceta(receta))),
+      tap(recetasTransformadas => {
+        // Log para verificar los datos transformados (opcional)
+        console.log('Recetas recibidas y transformadas:', recetasTransformadas);
+      }),
+      catchError(this.handleError)
+    );
   }
 
   // Obtener una receta por ID
@@ -33,7 +41,7 @@ export class RecetaService {
   }
 
   // Actualizar una receta existente
-  updateReceta(id: string, receta: Receta): Observable<Receta> { // O Observable<void> si el backend no devuelve contenido
+  updateReceta(id: string, receta: Receta): Observable<Receta> {
     return this.http.put<Receta>(`${this.apiUrl}/${id}`, receta)
       .pipe(catchError(this.handleError));
   }
