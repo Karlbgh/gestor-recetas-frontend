@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+import { AuthPageComponent } from './features/auth/pages/auth-page/auth-page.component';
 
 export const routes: Routes = [
   {
@@ -41,6 +42,7 @@ export const routes: Routes = [
       // }
     ]
   },
+  { path: 'auth', component: AuthPageComponent },
 // Rutas sin layout principal (ej. página de error específica)
   { path: 'not-found', component: NotFoundComponent },
   { path: '**', redirectTo: 'not-found' }

@@ -73,7 +73,7 @@ export class NavbarComponent {
   }
 
   navigateToLogin(): void {
-    this.router.navigate(['/login']);
+    this.router.navigate(['/auth']);
     this.closeMobileMenu();
   }
 
@@ -89,7 +89,6 @@ export class NavbarComponent {
 
   logout(): void {
     this.authService.logout();
-    // La redirección ya la maneja el authService
     this.closeMobileMenu();
   }
 
