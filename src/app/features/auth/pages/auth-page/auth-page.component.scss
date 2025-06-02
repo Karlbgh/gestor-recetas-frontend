@@ -1,0 +1,8 @@
+/* Estilos específicos para AuthPageComponent si fueran necesarios,
+   la mayoría de los estilos se manejan con Tailwind CSS en el HTML. */
+
+/* Ejemplo de cómo podrías añadir un fondo global si no usas el del body */
+:host {
+  display: block;
+  // background-color: #f3f4f6; /* bg-gray-100 */
+}
