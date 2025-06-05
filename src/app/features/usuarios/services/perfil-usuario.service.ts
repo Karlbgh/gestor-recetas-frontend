@@ -15,8 +15,8 @@ export class PerfilUsuarioService {
   /**
    * Obtiene el perfil del usuario actualmente autenticado.
    */
-  getPerfil(): Observable<PerfilUsuario> {
-    return this.http.get<PerfilUsuario>(this.apiUrl)
+  getPerfil(id?:string): Observable<PerfilUsuario> {
+    return this.http.get<PerfilUsuario>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 
@@ -25,7 +25,6 @@ export class PerfilUsuarioService {
    * @param perfil El objeto con los datos a actualizar (puede ser parcial).
    */
   updatePerfil(perfil: Partial<PerfilUsuario>): Observable<PerfilUsuario> {
-    // Usamos PUT, pero podría ser PATCH si tu API lo soporta para actualizaciones parciales.
     return this.http.put<PerfilUsuario>(this.apiUrl, perfil)
       .pipe(catchError(this.handleError));
   }

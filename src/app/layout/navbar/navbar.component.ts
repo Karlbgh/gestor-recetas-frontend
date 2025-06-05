@@ -1,5 +1,6 @@
-import { PerfilUsuarioService } from './../../features/usuarios/services/perfil-usuario.service';
-import { Component, inject, signal, ChangeDetectionStrategy, HostListener, ElementRef, computed } from '@angular/core';
+// src/app/layout/navbar/navbar.component.ts
+
+import { Component, inject, signal, ChangeDetectionStrategy, HostListener, ElementRef } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -16,13 +17,12 @@ import { AuthService } from '../../core/auth/auth.service';
 })
 export class NavbarComponent {
   private authService = inject(AuthService);
-  private PerfilUsuarioService = inject(PerfilUsuarioService);
   private router = inject(Router);
   private elementRef = inject(ElementRef);
 
   isAuthenticated = this.authService.isAuthenticated;
-  userName = computed(() =>  this.authService.getUserName());
-  userAvatarUrl = this.authService.avatarUrl;
+  userName = this.authService.profileName;
+  userAvatarUrl = this.authService.profileAvatarUrl;
 
   searchControl = new FormControl('');
   isMobileMenuOpen = signal(false);
@@ -54,7 +54,7 @@ export class NavbarComponent {
 
   handleSearch(term: string): void {
     if (term) {
-      this.router.navigate(['/recetas/buscar'], { queryParams: { q: term } });
+      this.router.navigate(['/recetas'], { queryParams: { search: term } });
     }
   }
 

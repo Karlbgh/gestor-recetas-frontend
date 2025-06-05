@@ -38,9 +38,8 @@ export class PerfilPageComponent implements OnInit {
     newPassword: ['', [Validators.required, Validators.minLength(6)]]
   });
 
-  // Avatar URL desde el servicio de autenticación (AuthService) se mantiene igual,
-  // ya que lee de user_metadata de Supabase Auth, que es independiente de tu tabla de perfiles.
-  avatarUrl = this.authService.avatarUrl;
+  // El avatarUrl ahora viene del estado centralizado en AuthService
+  avatarUrl = this.authService.profileAvatarUrl;
 
   ngOnInit(): void {
     this.cargarPerfil();
@@ -48,13 +47,16 @@ export class PerfilPageComponent implements OnInit {
 
   cargarPerfil(): void {
     this.isLoading.set(true);
-    this.perfilService.getPerfil().subscribe({
+
+    const idUser = this.authService.currentUser()?.id;
+    this.perfilService.getPerfil(idUser).subscribe({
       next: (data) => {
         this.perfil.set(data);
         this.perfilForm.patchValue({
           nombre: data.nombre,
           email: data.email
         });
+        this.authService.updateProfileData(data);
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -75,10 +77,11 @@ export class PerfilPageComponent implements OnInit {
       const publicUrl = this.authService.getAvatarPublicUrl(path);
       if (!publicUrl) throw new Error('No se pudo obtener la URL pública del avatar.');
 
-      await this.perfilService.updatePerfil({ foto_perfil: publicUrl }).toPromise();
+      const perfilActualizado = await this.perfilService.updatePerfil({ foto_perfil: publicUrl }).toPromise();
 
-      const { error: metadataError } = await this.authService.updateUserMetadata({ avatar_url: publicUrl });
-      if (metadataError) throw new Error('Error al actualizar los metadatos del usuario.');
+      if(perfilActualizado) {
+         this.authService.updateProfileData({ foto_perfil: perfilActualizado.foto_perfil });
+      }
 
       this.showSuccess('¡Avatar actualizado con éxito!');
 
@@ -97,12 +100,11 @@ export class PerfilPageComponent implements OnInit {
     const nombre = this.perfilForm.value.nombre as string;
 
     try {
-      // 1. Actualizar en tu backend (.NET)
-      await this.perfilService.updatePerfil({ nombre }).toPromise();
+      const perfilActualizado = await this.perfilService.updatePerfil({ nombre }).toPromise();
 
-      // 2. Actualizar metadatos en Supabase Auth
-      const { error } = await this.authService.updateUserMetadata({ name: nombre });
-      if (error) throw error;
+      if(perfilActualizado){
+         this.authService.updateProfileData({ nombre: perfilActualizado.nombre });
+      }
 
       this.showSuccess('Perfil actualizado con éxito.');
 
@@ -121,6 +123,7 @@ export class PerfilPageComponent implements OnInit {
     const newPassword = this.passwordForm.value.newPassword as string;
 
     try {
+      // La contraseña se maneja únicamente con Supabase Auth
       const { error } = await this.authService.updateUserPassword(newPassword);
       if (error) throw error;
 
