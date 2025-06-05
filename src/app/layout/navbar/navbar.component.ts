@@ -78,7 +78,7 @@ export class NavbarComponent {
   }
 
   navigateToRegister(): void {
-    this.router.navigate(['/registro']);
+    this.router.navigate(['/auth']);
     this.closeMobileMenu();
   }
 
