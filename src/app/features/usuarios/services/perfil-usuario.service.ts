@@ -1,5 +1,3 @@
-// src/app/features/usuarios/services/perfil-usuario.service.ts
-
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -16,19 +14,19 @@ export class PerfilUsuarioService {
 
   /**
    * Obtiene el perfil del usuario actualmente autenticado.
-   * La API debería identificar al usuario a través del token JWT.
    */
   getPerfil(): Observable<PerfilUsuario> {
-    return this.http.get<PerfilUsuario>(`${this.apiUrl}`)
+    return this.http.get<PerfilUsuario>(this.apiUrl)
       .pipe(catchError(this.handleError));
   }
 
   /**
-   * Actualiza el perfil del usuario.
-   * @param perfil El objeto con los datos a actualizar.
+   * Actualiza parcialmente el perfil del usuario.
+   * @param perfil El objeto con los datos a actualizar (puede ser parcial).
    */
   updatePerfil(perfil: Partial<PerfilUsuario>): Observable<PerfilUsuario> {
-    return this.http.put<PerfilUsuario>(`${this.apiUrl}`, perfil)
+    // Usamos PUT, pero podría ser PATCH si tu API lo soporta para actualizaciones parciales.
+    return this.http.put<PerfilUsuario>(this.apiUrl, perfil)
       .pipe(catchError(this.handleError));
   }
 

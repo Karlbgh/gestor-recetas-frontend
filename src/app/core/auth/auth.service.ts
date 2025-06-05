@@ -85,7 +85,6 @@ export class AuthService {
   }
 
   async loginWithEmail(email: string, password: string): Promise<{ user: User | null, session: Session | null, error: any }> {
-    // CORREGIDO: Desestructuramos la respuesta de Supabase
     const { data, error } = await this.supabase.auth.signInWithPassword({ email, password });
     return { user: data.user, session: data.session, error };
   }
@@ -115,12 +114,18 @@ export class AuthService {
   }
 
   async updateUserMetadata(data: { name?: string, avatar_url?: string }): Promise<{ user: User | null, error: any }> {
-    // CORREGIDO: Desestructuramos la respuesta y pasamos el payload correctamente
     const { data: updatedUserData, error } = await this.supabase.auth.updateUser({ data });
     return { user: updatedUserData.user, error };
   }
 
-  async uploadAvatar(file: File): Promise<{ path: string | null, error: any }> {
+  // --- NUEVOS MÉTODOS PARA EL AVATAR ---
+
+  /**
+   * Sube un archivo de imagen al bucket 'avatars' en Supabase Storage.
+   * @param file El archivo a subir.
+   * @returns El path del archivo subido o un error.
+   */
+  async uploadAvatar(file: File): Promise<{ path: string | null; error: any }> {
     const user = this.currentUser();
     if (!user) return { path: null, error: 'Usuario no autenticado' };
 
@@ -130,11 +135,17 @@ export class AuthService {
     const { error } = await this.supabase.storage.from('avatars').upload(filePath, file);
 
     if (error) {
+      console.error('Error al subir avatar a Supabase Storage:', error);
       return { path: null, error };
     }
     return { path: filePath, error: null };
   }
 
+  /**
+   * Obtiene la URL pública de un archivo en el bucket 'avatars'.
+   * @param path El path del archivo dentro del bucket.
+   * @returns La URL pública completa.
+   */
   getAvatarPublicUrl(path: string): string | null {
     if (!path) return null;
     const { data } = this.supabase.storage.from('avatars').getPublicUrl(path);

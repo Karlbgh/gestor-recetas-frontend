@@ -40,7 +40,7 @@
                 <img class="h-8 w-8 rounded-full object-cover" [src]="userAvatarUrl()" alt="Avatar">
               } @else {
                 <span class="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center text-white">
-                  {{ (userName() || 'U').charAt(0).toUpperCase() }}
+                  {{ userName() }}
                 </span>
               }
               <span class="hidden lg:block">{{ userName() || 'Perfil' }}</span>

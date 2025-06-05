@@ -1,4 +1,5 @@
-import { Component, inject, signal, WritableSignal, ChangeDetectionStrategy, HostListener, ElementRef, computed } from '@angular/core';
+import { PerfilUsuarioService } from './../../features/usuarios/services/perfil-usuario.service';
+import { Component, inject, signal, ChangeDetectionStrategy, HostListener, ElementRef, computed } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -15,11 +16,12 @@ import { AuthService } from '../../core/auth/auth.service';
 })
 export class NavbarComponent {
   private authService = inject(AuthService);
+  private PerfilUsuarioService = inject(PerfilUsuarioService);
   private router = inject(Router);
   private elementRef = inject(ElementRef);
 
   isAuthenticated = this.authService.isAuthenticated;
-  userName = computed(() => this.authService.getUserName());
+  userName = computed(() =>  this.authService.getUserName());
   userAvatarUrl = this.authService.avatarUrl;
 
   searchControl = new FormControl('');
