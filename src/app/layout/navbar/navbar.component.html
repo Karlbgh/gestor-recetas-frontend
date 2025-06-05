@@ -31,14 +31,20 @@
             <button
               (click)="toggleProfileMenu($event)"
               type="button"
-              class="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+              class="flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
               id="user-menu-button"
               [attr.aria-expanded]="isProfileMenuOpen()"
               aria-haspopup="true"
             >
-              <span class="mr-2">👤</span>
-              <span>{{ userName() || 'Perfil' }}</span>
-              <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              @if (userAvatarUrl()) {
+                <img class="h-8 w-8 rounded-full object-cover" [src]="userAvatarUrl()" alt="Avatar">
+              } @else {
+                <span class="h-8 w-8 rounded-full bg-gray-600 flex items-center justify-center text-white">
+                  {{ (userName() || 'U').charAt(0).toUpperCase() }}
+                </span>
+              }
+              <span class="hidden lg:block">{{ userName() || 'Perfil' }}</span>
+              <svg class="hidden lg:block -mr-1 ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.23 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
               </svg>
             </button>
@@ -53,17 +59,11 @@
                 <a (click)="navigateToProfile()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" role="menuitem" tabindex="-1">Mi Perfil</a>
                 <a (click)="navigateToMyRecipes()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" role="menuitem" tabindex="-1">Mis Recetas</a>
                 <a (click)="navigateToCreateRecipe()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" role="menuitem" tabindex="-1">Crear Receta</a>
+                <div class="border-t border-gray-100"></div>
+                <a (click)="logout()" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" role="menuitem" tabindex="-1">Logout</a>
               </div>
             }
           </div>
-
-          <button
-            (click)="logout()"
-            type="button"
-            class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-          >
-            Logout
-          </button>
         } @else {
           <button
             (click)="navigateToLogin()"
@@ -133,19 +133,7 @@
             (click)="navigateToProfile()"
             class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white cursor-pointer"
           >
-            Mi Perfil
-          </a>
-          <a
-            (click)="navigateToMyRecipes()"
-            class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white cursor-pointer"
-          >
-            Mis Recetas
-          </a>
-          <a
-            (click)="navigateToCreateRecipe()"
-            class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white cursor-pointer"
-          >
-            Crear Receta
+            {{ userName() || 'Perfil' }}
           </a>
           <a
             (click)="logout()"
