@@ -101,7 +101,7 @@ export class AuthService {
     const user = this.currentUser();
     // CORREGIDO: Buscar el nombre en user_metadata, que se guarda en el registro.
     // Usar el email como fallback si no existe.
-    return user?.user_metadata?.['username'] || user?.email || null;
+    return user?.user_metadata?.['name'] || user?.email || null;
   }
 
   getToken(): string | null {

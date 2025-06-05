@@ -31,8 +31,8 @@ export class NavbarComponent {
   // CORREGIDO: Usamos `computed` para derivar el nombre del usuario de forma reactiva.
   // Esta señal se actualizará automáticamente cuando `currentUser` en el servicio cambie.
   userName = computed(() => {
-    const user = this.authService.currentUser();
-    return user?.user_metadata?.['username'] || user?.email || null;
+    const user = this.authService.getUserName();
+    return user;
   });
 
   searchTerm: WritableSignal<string> = signal('');
