@@ -73,12 +73,12 @@ export class NavbarComponent {
   }
 
   navigateToLogin(): void {
-    this.router.navigate(['/auth']);
+     this.router.navigate(['/auth'], { queryParams: { mode: 'login' } });
     this.closeMobileMenu();
   }
 
   navigateToRegister(): void {
-    this.router.navigate(['/auth']);
+    this.router.navigate(['/auth'], { queryParams: { mode: 'register' } });
     this.closeMobileMenu();
   }
 
