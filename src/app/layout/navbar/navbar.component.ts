@@ -1,4 +1,4 @@
-import { Component, inject, signal, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, WritableSignal, ChangeDetectionStrategy, HostListener, ElementRef, computed } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -23,15 +23,23 @@ import { AuthService } from '../../core/auth/auth.service';
 export class NavbarComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private elementRef = inject(ElementRef);
   // private recetaService = inject(RecetaService); // Descomentar si tienes el servicio de recetas
 
   isAuthenticated = this.authService.isAuthenticated; // Signal del servicio de autenticación
-  userName = this.authService.getUserName; // Signal o método para obtener el nombre del usuario
+
+  // CORREGIDO: Usamos `computed` para derivar el nombre del usuario de forma reactiva.
+  // Esta señal se actualizará automáticamente cuando `currentUser` en el servicio cambie.
+  userName = computed(() => {
+    const user = this.authService.currentUser();
+    return user?.user_metadata?.['username'] || user?.email || null;
+  });
 
   searchTerm: WritableSignal<string> = signal('');
   searchControl = new FormControl('');
 
   isMobileMenuOpen: WritableSignal<boolean> = signal(false);
+  isProfileMenuOpen: WritableSignal<boolean> = signal(false);
 
   constructor() {
     this.searchControl.valueChanges
@@ -44,8 +52,22 @@ export class NavbarComponent {
       .subscribe();
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Si el clic fue fuera del componente navbar, cierra el menú de perfil
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.closeProfileMenu();
+    }
+  }
+
   toggleMobileMenu(): void {
     this.isMobileMenuOpen.update(isOpen => !isOpen);
+  }
+
+  toggleProfileMenu(event: MouseEvent): void {
+    // Detenemos la propagación para que el clic no llegue al HostListener del documento
+    event.stopPropagation();
+    this.isProfileMenuOpen.update(isOpen => !isOpen);
   }
 
   handleSearch(term: string | null): void {
@@ -84,17 +106,39 @@ export class NavbarComponent {
 
   navigateToProfile(): void {
     this.router.navigate(['/perfil']); // Asegúrate de que esta ruta existe
+    this.closeProfileMenu();
+    this.closeMobileMenu();
+  }
+
+  navigateToMyRecipes(): void {
+    // TODO: Asegúrate de que la ruta '/mis-recetas' exista en tu configuración de rutas.
+    this.router.navigate(['/mis-recetas']);
+    this.closeProfileMenu();
+    this.closeMobileMenu();
+  }
+
+  navigateToCreateRecipe(): void {
+    // Asegúrate de que la ruta '/recetas/nueva' exista en tu configuración de rutas.
+    this.router.navigate(['/recetas/nueva']);
+    this.closeProfileMenu();
     this.closeMobileMenu();
   }
 
   logout(): void {
     this.authService.logout();
+    this.closeProfileMenu();
     this.closeMobileMenu();
   }
 
   private closeMobileMenu(): void {
     if (this.isMobileMenuOpen()) {
       this.isMobileMenuOpen.set(false);
+    }
+  }
+
+  private closeProfileMenu(): void {
+    if (this.isProfileMenuOpen()) {
+      this.isProfileMenuOpen.set(false);
     }
   }
 }

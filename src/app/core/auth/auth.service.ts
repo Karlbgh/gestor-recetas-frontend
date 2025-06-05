@@ -76,42 +76,6 @@ export class AuthService {
     });
   }
 
-  private checkInitialAuthStatus(): boolean {
-    // Lógica para comprobar si el usuario ya está autenticado al cargar la app
-    // Por ejemplo, revisando localStorage o una cookie.
-    // Esto es solo un placeholder.
-    if (typeof localStorage !== 'undefined') {
-      return localStorage.getItem('isLoggedIn') === 'true';
-    }
-    return false;
-  }
-
-  login(userData: any): void {
-    // Lógica de login real aquí (ej. llamada a API)
-    // ...
-
-    // Simulando un login exitoso
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('isLoggedIn', 'true');
-    }
-    this._isAuthenticated.set(true);
-    // this._currentUser.set({ nombre: 'Usuario Ejemplo', email: userData.email }); // Guardar info del usuario
-    this.router.navigate(['/']); // Redirigir a la página principal o al dashboard
-  }
-
-  register(userData: any): void {
-    // Lógica de registro real aquí (ej. llamada a API)
-    // ...
-
-    // Simulando un registro exitoso y login automático
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('isLoggedIn', 'true');
-    }
-    this._isAuthenticated.set(true);
-    // this._currentUser.set({ nombre: 'Nuevo Usuario', email: userData.email });
-    this.router.navigate(['/']);
-  }
-
   async logout(): Promise<void> {
     console.log('AuthService: Intentando cerrar sesión con Supabase.');
     const { error } = await this.supabase.auth.signOut();
@@ -135,11 +99,14 @@ export class AuthService {
 
   getUserName(): string | null {
     const user = this.currentUser();
-    return user ? user.id : null;
+    // CORREGIDO: Buscar el nombre en user_metadata, que se guarda en el registro.
+    // Usar el email como fallback si no existe.
+    return user?.user_metadata?.['username'] || user?.email || null;
   }
 
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    const session = this.currentSession();
+    return session?.access_token || null;
   }
 
 async loginWithEmail(email: string, password: string): Promise<{ user: User | null, session: Session | null, error: any }> {
