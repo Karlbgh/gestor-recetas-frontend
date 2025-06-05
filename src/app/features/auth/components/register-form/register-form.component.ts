@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { AuthService } from '../../../../core/auth/auth.service'; // Asegúrate que la ruta sea correcta
+import { AuthService } from '../../../../core/auth/auth.service';
 
 // Validador personalizado para confirmar que las contraseñas coinciden
 export function passwordMatchValidator(controlName: string, matchingControlName: string): ValidatorFn {
@@ -14,7 +14,6 @@ export function passwordMatchValidator(controlName: string, matchingControlName:
     }
 
     if (matchingControl.errors && !matchingControl.errors['passwordMismatch']) {
-      // return if another validator has already found an error on the matchingControl
       return null;
     }
 
@@ -28,7 +27,6 @@ export function passwordMatchValidator(controlName: string, matchingControlName:
   };
 }
 
-
 @Component({
   selector: 'app-register-form',
   standalone: true,
@@ -38,7 +36,7 @@ export function passwordMatchValidator(controlName: string, matchingControlName:
 })
 export class RegisterFormComponent {
   private fb = inject(FormBuilder);
-  private authService = inject(AuthService); // Inyecta tu AuthService
+  private authService = inject(AuthService);
 
   registerForm = this.fb.group({
     username: ['', [Validators.required, Validators.minLength(3)]],
@@ -47,15 +45,47 @@ export class RegisterFormComponent {
     confirmPassword: ['', [Validators.required]]
   }, { validators: passwordMatchValidator('password', 'confirmPassword') });
 
-  onSubmit(): void {
-    if (this.registerForm.valid) {
-      const { username, email, password } = this.registerForm.value;
-      console.log('Register submitted:', { username, email, password });
-      // Aquí llamarías a tu servicio de autenticación
-      // this.authService.registerWithEmail(username!, email!, password!).subscribe(...);
-    } else {
+  // Señales para un feedback de UI claro y reactivo
+  isLoading: WritableSignal<boolean> = signal(false);
+  errorMessage: WritableSignal<string | null> = signal(null);
+  successMessage: WritableSignal<string | null> = signal(null);
+
+  async onSubmit(): Promise<void> {
+    if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
-      console.error('Formulario no válido');
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    const { username, email, password } = this.registerForm.value;
+
+    if (!username || !email || !password) {
+      this.errorMessage.set('Faltan campos por rellenar.');
+      this.isLoading.set(false);
+      return;
+    }
+
+    try {
+      const { error } = await this.authService.registerWithEmail(email, password, username);
+
+      if (error) {
+        if (error.message.includes('User already registered')) {
+          this.errorMessage.set('Este correo electrónico ya está registrado.');
+        } else {
+          this.errorMessage.set(`Error en el registro: ${error.message}`);
+        }
+      } else {
+        this.successMessage.set('¡Registro exitoso! Por favor, revisa tu correo para confirmar tu cuenta.');
+        this.registerForm.reset();
+      }
+    } catch (e: any) {
+      console.error('Excepción durante el registro:', e);
+      this.errorMessage.set(e.message || 'Ocurrió un error inesperado durante el registro.');
+    } finally {
+      this.isLoading.set(false);
     }
   }
 

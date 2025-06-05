@@ -4,6 +4,7 @@ import { createClient, SupabaseClient, AuthChangeEvent, Session, User } from '@s
 import { environment } from '../../../environments/environment';
 import { Observable, from } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -21,6 +22,11 @@ export class AuthService {
 
   private _currentSession: WritableSignal<Session | null> = signal(null);
   public currentSession = this._currentSession.asReadonly();
+
+  // Signal para notificar cuando ocurre el evento de recuperación
+  private _recoveryEventOccurred: WritableSignal<boolean> = signal(false);
+  public recoveryEventOccurred = this._recoveryEventOccurred.asReadonly();
+
 
  constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
@@ -42,10 +48,18 @@ export class AuthService {
     this.supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
       this.ngZone.run(() => {
         console.log('Auth state change:', event, session);
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        if (event === 'PASSWORD_RECOVERY') {
+            console.log('Evento de recuperación de contraseña detectado.');
+            this._recoveryEventOccurred.set(true);
+            // No establecemos la sesión como autenticada todavía.
+            // El usuario necesita establecer una nueva contraseña.
+        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           this._isAuthenticated.set(true);
           this._currentUser.set(session!.user); // session no será null en SIGNED_IN
           this._currentSession.set(session);
+          // Si el usuario actualiza su contraseña, la sesión se actualiza y podría
+          // entrar aquí. Limpiamos el flag de recuperación.
+          this._recoveryEventOccurred.set(false);
           // Opcional: Redirigir si es un SIGNED_IN y el usuario no está ya en una ruta protegida.
           if (event === 'SIGNED_IN' && this.router.url.includes('/auth')) {
             this.router.navigate(['/']);
@@ -55,6 +69,7 @@ export class AuthService {
           this._isAuthenticated.set(false);
           this._currentUser.set(null);
           this._currentSession.set(null);
+          this._recoveryEventOccurred.set(false); // Limpiar al cerrar sesión
           this.router.navigate(['/']);
         }
       });
@@ -118,20 +133,17 @@ export class AuthService {
     }
   }
 
-  // Podrías añadir un método para obtener el nombre del usuario para el perfil
   getUserName(): string | null {
     const user = this.currentUser();
     return user ? user.id : null;
   }
 
   getToken(): string | null {
-    // Aquí podrías implementar la lógica para obtener un token de autenticación
-    // Por ejemplo, desde localStorage o una cookie
     return localStorage.getItem('authToken');
   }
 
 async loginWithEmail(email: string, password: string): Promise<{ user: User | null, session: Session | null, error: any }> {
-    console.log(`AuthService: Intentando iniciar sesión con Supabase. Email: ${email}`);
+    console.log(`AuthService: Intentando iniciar sesión con Supabase. Email: ${email} - Password: ${password}`);
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email: email,
       password: password,
@@ -153,7 +165,7 @@ async loginWithEmail(email: string, password: string): Promise<{ user: User | nu
       this.router.navigate(['/']);
       return { user: data.user, session: data.session, error: null };
     }
-    // Caso inesperado
+
     return { user: null, session: null, error: new Error('Respuesta inesperada de Supabase en login.') };
   }
 
@@ -172,10 +184,44 @@ async loginWithEmail(email: string, password: string): Promise<{ user: User | nu
       console.error('Error en registro con Supabase:', error);
       return { user: null, session: null, error };
     }
-    // Si el registro es exitoso pero requiere confirmación de email, data.user no estará autenticado aún.
-    // onAuthStateChange manejará el estado si el usuario se autentica después de confirmar.
-    // Si la confirmación de email no está habilitada, data.user y data.session estarán presentes.
+
     console.log('Registro enviado a Supabase:', data);
     return { user: data.user, session: data.session, error: null };
+  }
+
+  async signInWithGoogle(): Promise<void> {
+    console.log('AuthService: Intentando iniciar sesión con Google.');
+    const { error } = await this.supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+
+    if (error) {
+      console.error('Error al iniciar sesión con Google (Supabase):', error);
+    }
+  }
+
+  /**
+   * Envía un correo para restablecer la contraseña a través de Supabase.
+   * @param email El correo del usuario.
+   */
+  async sendPasswordResetEmail(email: string): Promise<{ error: any }> {
+    const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/update-password`, // URL a la que se redirigirá al usuario
+    });
+    return { error };
+  }
+
+  /**
+   * Actualiza la contraseña del usuario actualmente en sesión de recuperación.
+   * @param password La nueva contraseña.
+   */
+  async updateUserPassword(password: string): Promise<{ user: User | null, error: any }> {
+    const { data, error } = await this.supabase.auth.updateUser({ password: password });
+    if (!error && data.user) {
+        // La sesión se actualiza automáticamente por onAuthStateChange.
+        // Limpiamos el flag de recuperación manualmente aquí también.
+        this._recoveryEventOccurred.set(false);
+    }
+    return { user: data.user, error };
   }
 }
