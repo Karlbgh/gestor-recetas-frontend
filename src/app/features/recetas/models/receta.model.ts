@@ -43,7 +43,7 @@ export interface Receta {
 
   // --- Campos para la vista de detalle ---
   ingredientes?: RecetaIngrediente[];
-  pasos?: string[];
+  preparacion?: string;
   tiempoPreparacion?: number;
   nombreCreador?: string;
   comentarios?: Comentario[];
