@@ -14,14 +14,11 @@ export class RecetaService {
 
   constructor() { }
 
-  // Obtener todas las recetas (con posible paginación o filtros)
   getRecetas(): Observable<Receta[]> {
     console.log(`Solicitando recetas desde: ${this.apiUrl}`);
 
     return this.http.get<Receta[]>(this.apiUrl).pipe(
-      // map(recetas => recetas.map(receta => this.transformarReceta(receta))),
       tap(recetasTransformadas => {
-        // Log para verificar los datos transformados (opcional)
         console.log('Recetas recibidas y transformadas:', recetasTransformadas);
       }),
       catchError(this.handleError)
@@ -58,7 +55,7 @@ export class RecetaService {
   }
 
   // Eliminar una receta
-  deleteReceta(id: string): Observable<void> { // O Observable<any>
+  deleteReceta(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
@@ -76,20 +73,15 @@ export class RecetaService {
 
   // Manejo de errores básico
   private handleError(error: HttpErrorResponse) {
-    // Aquí podrías enviar el error a un servicio de logging remoto
     console.error('Ocurrió un error en el servicio de Recetas:', error);
-    // Podrías personalizar el mensaje de error basado en error.status
     let errorMessage = 'Algo salió mal; por favor, inténtalo de nuevo más tarde.';
     if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente o de red
       errorMessage = `Error: ${error.error.message}`;
     } else {
-      // El backend devolvió un código de respuesta insatisfactorio.
-      // El cuerpo de la respuesta puede contener pistas sobre qué salió mal.
       errorMessage = `Error Código: ${error.status}\nMensaje: ${error.message}`;
       if (error.error && typeof error.error === 'string') {
         errorMessage += `\nDetalle: ${error.error}`;
-      } else if (error.error && error.error.errors) { // Para errores de validación de ASP.NET Core
+      } else if (error.error && error.error.errors) {
         const errors = Object.values(error.error.errors).flat();
         errorMessage += `\nDetalles: ${errors.join(', ')}`;
       }

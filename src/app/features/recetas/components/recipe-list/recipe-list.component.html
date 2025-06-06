@@ -32,7 +32,7 @@
   }-->
   @else if (recetas().length > 0) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8">
-      @for (receta of recetas(); track receta.id) {
+      @for (receta of recetas(); track receta.idReceta) {
         <app-recipe-card
           [receta]="receta"
           (verDetalle)="onVerDetalleReceta($event)"

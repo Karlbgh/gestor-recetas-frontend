@@ -25,7 +25,7 @@ export class RecipeCardComponent {
   }
 
   onVerDetalle(): void {
-    this.verDetalle.emit(this.receta.id);
+    this.verDetalle.emit(this.receta.idReceta);
   }
 
   // onToggleFavorito(event: MouseEvent): void {

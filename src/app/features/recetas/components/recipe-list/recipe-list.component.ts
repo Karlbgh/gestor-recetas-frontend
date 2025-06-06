@@ -49,9 +49,8 @@ export class RecipeListComponent implements OnInit {
   onToggleFavoritoReceta(event: { id: string | number; esFavorito: boolean }): void {
     const { id, esFavorito } = event;
 
-    // Optimistic update: Actualizar la UI inmediatamente
     this.recetas.update(currentRecetas =>
-      currentRecetas.map(r => (r.id === id ? { ...r, esFavorito: esFavorito } : r))
+      currentRecetas.map(r => (r.idReceta === id ? { ...r, esFavorito: esFavorito } : r))
     );
 
     // this.recetaService.toggleFavorito(id, esFavorito).subscribe({

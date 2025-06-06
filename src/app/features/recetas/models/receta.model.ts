@@ -21,29 +21,15 @@ export interface IngredienteEnReceta {
 }
 
 export interface Receta {
-  id: number | string;
+  idReceta: number | string;
   nombre: string;
   descripcion: string;
-  // tiempoPreparacion: string; // Ej: "30 minutos", "1 hora", "1h 15min"
+  imagen?: string;
   dificultad: 'Fácil' | 'Media' | 'Difícil';
   comensales?: number;
-  // instrucciones?: string; // O string[] si son pasos detallados
-  imagen?: string; // URL de la imagen de la receta
-  // fechaCreacion: Date | string; // Usar string si el backend devuelve así y convertir si es necesario
-  // fechaActualizacion?: Date | string;
-
-  // Relaciones y datos anidados
-  //creador?: UsuarioSimple; // Información del creador de la receta
-  creatorId?: number | string; // Alternativa si solo tienes el ID y necesitas cargar el creador por separado
-  // ingredientes: IngredienteEnReceta[];
-  // comentarios?: Comentario[];
-  // Información Nutricional (calculada o almacenada)
   caloriasTotales?: number;
   grasasTotales?: number;
   proteinasTotales?: number;
   carbohidratosTotales?: number;
-
-  // Campos para la UI que pueden venir del backend o calcularse en el frontend
-  // puntuacionMedia?: number; // Puntuación promedio de la receta
-  // esFavorito?: boolean; // Indicador si es favorita para el usuario actual
+  creatorId?: number | string;
 }

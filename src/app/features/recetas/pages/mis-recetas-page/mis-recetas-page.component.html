@@ -22,7 +22,7 @@
   }
   @else if (recetas().length > 0) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8">
-      @for (receta of recetas(); track receta.id) {
+      @for (receta of recetas(); track receta.idReceta) {
         <div class="flex flex-col h-full">
           <app-recipe-card
             class="flex-grow"
@@ -30,9 +30,9 @@
             (verDetalle)="onVerDetalleReceta($event)">
           </app-recipe-card>
           <div class="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-b-xl border-t border-gray-200">
-             <button (click)="onEditarReceta(receta.id)" class="text-sm font-medium text-sky-600 hover:text-sky-800 transition">Editar</button>
+             <button (click)="onEditarReceta(receta.idReceta)" class="text-sm font-medium text-sky-600 hover:text-sky-800 transition">Editar</button>
              <span class="text-gray-300">|</span>
-             <button (click)="onEliminarReceta(receta.id)" class="text-sm font-medium text-red-600 hover:text-red-800 transition">Eliminar</button>
+             <button (click)="onEliminarReceta(receta.idReceta)" class="text-sm font-medium text-red-600 hover:text-red-800 transition">Eliminar</button>
           </div>
         </div>
       }
@@ -53,4 +53,14 @@
       </div>
     </div>
   }
+
+  @if (showDeleteConfirmation()) {
+    <app-confirmation-dialog
+      title="Confirmar Eliminación"
+      [message]="'¿Estás seguro de que quieres eliminar la receta \'' + (recetaAEliminar()?.nombre || '') + '\'?'"
+      (confirm)="confirmDelete()"
+      (cancel)="cancelDelete()"
+    ></app-confirmation-dialog>
+  }
+
 </div>
