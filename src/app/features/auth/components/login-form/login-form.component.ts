@@ -57,7 +57,7 @@ export class LoginFormComponent {
         }
         console.error('Error en el componente de login:', error);
       } else if (user && session) {
-        console.log('Login exitoso desde el componente:', user);
+        //console.log('Login exitoso desde el componente:', user);
         // AuthService.onAuthStateChange se encargará de la redirección principal
         // pero si necesitas una acción específica aquí, puedes hacerla.
         // Ejemplo: this.router.navigate(['/dashboard']);

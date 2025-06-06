@@ -15,14 +15,13 @@ export class SocialAuthButtonsComponent {
   errorMessageGoogle: WritableSignal<string | null> = signal(null);
 
   async loginWithGoogle(): Promise<void> {
-    console.log('SocialAuthButtonsComponent: Login with Google clicked');
-    console.log('AuthService instance in SocialAuthButtonsComponent (moved up):', this.authService);
+    //console.log('SocialAuthButtonsComponent: Login with Google clicked');
+    //console.log('AuthService instance in SocialAuthButtonsComponent (moved up):', this.authService);
     this.isLoadingGoogle.set(true);
     this.errorMessageGoogle.set(null);
 
     try {
-      // --> NUEVO CONSOLE.LOG AQUÍ <--
-      console.log('AuthService instance in SocialAuthButtonsComponent:', this.authService);
+      //console.log('AuthService instance in SocialAuthButtonsComponent:', this.authService);
 
       if (!this.authService) {
         console.error('AuthService no está inyectado o no está disponible.');

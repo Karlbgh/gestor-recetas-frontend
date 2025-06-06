@@ -36,19 +36,19 @@ export class AuthService {
 
 constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
-    console.log('[DEBUG] AuthService: Constructor inicializado.');
+    // console.log('[DEBUG] AuthService: Constructor inicializado.');
 
     this.supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('[DEBUG] AuthService: getSession completado.', session);
+      //console.log('[DEBUG] AuthService: getSession completado.', session);
       this._updateAuthState(!!session, session);
       if (session) {
-        console.log('[DEBUG] AuthService: Sesión encontrada, llamando a loadUserProfile.');
+        //console.log('[DEBUG] AuthService: Sesión encontrada, llamando a loadUserProfile.');
         this.loadUserProfile();
       }
     });
 
     this.supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
-      console.log('[DEBUG] AuthService: onAuthStateChange evento:', event);
+      //console.log('[DEBUG] AuthService: onAuthStateChange evento:', event);
       this.ngZone.run(() => {
         this._updateAuthStateOnEvent(event, session);
       });
@@ -56,14 +56,14 @@ constructor() {
   }
 
   loadUserProfile(): void {
-    console.log('[DEBUG] AuthService: Iniciando loadUserProfile...');
+    //console.log('[DEBUG] AuthService: Iniciando loadUserProfile...');
 
     if (!this.isAuthenticated()) {
       console.warn('[DEBUG] AuthService: loadUserProfile detenido, usuario no autenticado.');
       return;
     }
     const userId = this.currentUser()?.id;
-    console.log('[DEBUG] AuthService: ID de usuario para la consulta:', userId);
+    //console.log('[DEBUG] AuthService: ID de usuario para la consulta:', userId);
 
     if (!userId) {
       console.warn('[DEBUG] AuthService: loadUserProfile detenido, no se encontró ID de usuario.');
@@ -72,10 +72,10 @@ constructor() {
 
     this.perfilUsuarioService.getPerfil(userId).pipe(take(1)).subscribe({
       next: (perfil: PerfilUsuario) => {
-        console.log('[DEBUG] AuthService: Perfil recibido del backend:', JSON.stringify(perfil, null, 2));
+       // console.log('[DEBUG] AuthService: Perfil recibido del backend:', JSON.stringify(perfil, null, 2));
 
         if (perfil && perfil.fotoPerfil) {
-          console.log('[DEBUG] AuthService: "foto_perfil" encontrado con valor:', perfil.fotoPerfil);
+         // console.log('[DEBUG] AuthService: "foto_perfil" encontrado con valor:', perfil.fotoPerfil);
         } else {
           console.warn('[DEBUG] AuthService: "foto_perfil" NO encontrado o es nulo en el objeto de perfil recibido.');
         }
@@ -119,7 +119,7 @@ constructor() {
   }
 
   private _updateAuthStateOnEvent(event: AuthChangeEvent, session: Session | null) {
-    console.log('Auth state change:', event, session);
+    //('Auth state change:', event, session);
 
     switch (event) {
       case 'SIGNED_IN':

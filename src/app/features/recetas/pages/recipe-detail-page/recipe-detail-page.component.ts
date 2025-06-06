@@ -41,6 +41,7 @@ export class RecipeDetailPageComponent implements OnInit {
       next: (data) => {
         this.receta.set(data);
         this.isLoading.set(false);
+        console.log('Receta cargada:', data);
       },
       error: (error: HttpErrorResponse) => {
         if (error.status === 404) {

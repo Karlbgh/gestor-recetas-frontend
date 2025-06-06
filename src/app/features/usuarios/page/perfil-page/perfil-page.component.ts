@@ -81,12 +81,12 @@ export class PerfilPageComponent implements OnInit {
     }
 
     const oldAvatarUrl = this.perfil()?.fotoPerfil;
-    console.log(`Avatar antiguo: ${oldAvatarUrl}`);
+    //console.log(`Avatar antiguo: ${oldAvatarUrl}`);
     try {
       if (oldAvatarUrl) {
         const oldPath = this.authService.getPathFromUrl(oldAvatarUrl, 'avatars');
         if (oldPath) {
-          console.log(`Intentando eliminar el avatar anterior en la ruta: ${oldPath}`);
+          //console.log(`Intentando eliminar el avatar anterior en la ruta: ${oldPath}`);
           await this.authService.deleteAvatar(oldPath);
         }
       }
@@ -116,7 +116,7 @@ export class PerfilPageComponent implements OnInit {
     }
 
     const nombre = this.perfilForm.value.nombre as string;
-    console.log(`Actualizando perfil de usuario con nombre: ${nombre}`);
+    //(`Actualizando perfil de usuario con nombre: ${nombre}`);
     try {
       await this.perfilService.updatePerfil(userId, { nombre}).toPromise();
       this.authService.loadUserProfile();
