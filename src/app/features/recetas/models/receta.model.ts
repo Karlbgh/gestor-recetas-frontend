@@ -32,4 +32,11 @@ export interface Receta {
   proteinasTotales?: number;
   carbohidratosTotales?: number;
   creatorId?: number | string;
+
+  // --- Campos para la vista de detalle ---
+  ingredientes?: IngredienteEnReceta[];
+  pasos?: string[]; // Pasos de preparación como un array de strings
+  tiempoPreparacion?: number; // En minutos
+  creador?: UsuarioSimple;
+  comentarios?: Comentario[];
 }
