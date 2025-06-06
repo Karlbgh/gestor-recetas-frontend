@@ -43,14 +43,14 @@ export class RecipeDetailPageComponent implements OnInit {
         return this.recetaService.getIngredientesPorReceta(id).pipe(
           tap(ingredientes => {
             recetaData.ingredientes = ingredientes;
-            this.receta.set(recetaData);
-            console.log('Receta completa con ingredientes:', recetaData);
+            const recetaCalculada = this.calcularValoresNutricionales(recetaData);
+            this.receta.set(recetaCalculada);
+            console.log('Receta completa con ingredientes y valores calculados:', recetaCalculada);
           })
         );
       })
     ).subscribe({
       next: () => {
-        // La lógica principal ya se ha ejecutado en los operadores `tap`
         this.isLoading.set(false);
       },
       error: (error: HttpErrorResponse) => {
@@ -65,9 +65,39 @@ export class RecipeDetailPageComponent implements OnInit {
   }
 
   /**
-   * Navega a la lista principal de recetas.
-   * Este método es público para poder ser llamado desde la plantilla.
+   * @param receta La receta con su lista de ingredientes.
+   * @returns La receta actualizada con los totales calculados.
    */
+  private calcularValoresNutricionales(receta: Receta): Receta {
+    let caloriasTotales = 0;
+    let grasasTotales = 0;
+    let proteinasTotales = 0;
+    let carbohidratosTotales = 0;
+    let azucaresTotales = 0;
+    let sodioTotal = 0;
+
+    if (receta.ingredientes) {
+      for (const ingrediente of receta.ingredientes) {
+        caloriasTotales += (ingrediente.calorias / 100) * ingrediente.cantidad;
+        grasasTotales += (ingrediente.grasas / 100) * ingrediente.cantidad;
+        proteinasTotales += (ingrediente.proteinas / 100) * ingrediente.cantidad;
+        carbohidratosTotales += (ingrediente.carbohidratos/ 100) * ingrediente.cantidad;
+        azucaresTotales += (ingrediente.azucares / 100) * ingrediente.cantidad;
+        sodioTotal += (ingrediente.sodio / 100) * ingrediente.cantidad;
+      }
+    }
+
+    return {
+      ...receta,
+      caloriasTotales: Math.round(caloriasTotales),
+      grasasTotales: Math.round(grasasTotales),
+      proteinasTotales: Math.round(proteinasTotales),
+      carbohidratosTotales: Math.round(carbohidratosTotales),
+      azuacaresTotales: Math.round(azucaresTotales),
+      sodioTotal: Math.round(sodioTotal),
+    };
+  }
+
   navigateToRecetas(): void {
     this.router.navigate(['/recetas']);
   }

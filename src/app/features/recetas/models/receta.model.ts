@@ -37,6 +37,8 @@ export interface Receta {
   grasasTotales?: number;
   proteinasTotales?: number;
   carbohidratosTotales?: number;
+  azuacaresTotales?: number;
+  sodioTotal?: number;
   creatorId?: number | string;
 
   // --- Campos para la vista de detalle ---
