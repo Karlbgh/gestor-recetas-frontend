@@ -15,7 +15,7 @@
       </div>
     </div>
   } @else if (receta()) {
-    <article>
+    <article class="pb-12">
       <header class="relative h-64 md:h-96 w-full">
         <img [ngSrc]="receta()!.imagen || placeholderImageUrl" [alt]="'Foto de ' + receta()!.nombre"
              class="w-full h-full object-cover" priority fill>
@@ -26,8 +26,9 @@
         </div>
       </header>
 
-      <div class="container mx-auto max-w-5xl -mt-10 md:-mt-16 z-10 relative">
-        <div class="bg-white rounded-xl shadow-lg p-5 mb-8 flex flex-wrap items-center justify-around gap-4 text-center">
+      <div class="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+
+        <div class="relative z-10 -mt-8 bg-white rounded-xl shadow-lg p-5 flex flex-wrap items-center justify-around gap-4 text-center">
           <div class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             <div>
@@ -60,7 +61,7 @@
            }
         </div>
 
-        <main class="bg-white rounded-xl shadow-lg p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <main class="bg-white rounded-xl shadow-lg p-6 md:p-8 mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div class="lg:col-span-1 space-y-8">
             <section>
               <h2 class="text-2xl font-bold text-gray-800 border-b-2 border-sky-500 pb-2 mb-4">Ingredientes</h2>
