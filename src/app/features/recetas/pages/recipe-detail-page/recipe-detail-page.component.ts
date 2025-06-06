@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Receta } from '../../models/receta.model';
 import { RecetaService } from '../../services/receta.service';
+import { switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-recipe-detail-page',
@@ -37,18 +38,28 @@ export class RecipeDetailPageComponent implements OnInit {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.recetaService.getRecetaById(id).subscribe({
-      next: (data) => {
-        this.receta.set(data);
+    this.recetaService.getRecetaById(id).pipe(
+      switchMap(recetaData => {
+        return this.recetaService.getIngredientesPorReceta(id).pipe(
+          tap(ingredientes => {
+            recetaData.ingredientes = ingredientes;
+            this.receta.set(recetaData);
+            console.log('Receta completa con ingredientes:', recetaData);
+          })
+        );
+      })
+    ).subscribe({
+      next: () => {
+        // La lógica principal ya se ha ejecutado en los operadores `tap`
         this.isLoading.set(false);
-        console.log('Receta cargada:', data);
       },
       error: (error: HttpErrorResponse) => {
         if (error.status === 404) {
           this.handleError('La receta que buscas no existe. Es posible que haya sido eliminada.');
         } else {
-          this.handleError('No se pudo cargar la receta. Por favor, inténtalo de nuevo más tarde.');
+          this.handleError('No se pudo cargar la receta o sus ingredientes. Por favor, inténtalo de nuevo más tarde.');
         }
+        this.isLoading.set(false);
       },
     });
   }

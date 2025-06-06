@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, tap, delay, map } from 'rxjs/operators';
-import { Receta, UsuarioSimple } from '../models/receta.model';
+import { Receta, RecetaIngrediente, UsuarioSimple } from '../models/receta.model';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({
@@ -28,6 +28,16 @@ export class RecetaService {
   // Obtener una receta por ID de receta
   getRecetaById(id: string): Observable<Receta> {
     return this.http.get<Receta>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Obtiene los ingredientes para una receta específica.
+   * @param recetaId El ID de la receta.
+   * @returns Un Observable con un array de RecetaIngrediente.
+   */
+  getIngredientesPorReceta(recetaId: string): Observable<RecetaIngrediente[]> {
+    return this.http.get<RecetaIngrediente[]>(`${this.apiUrl}/${recetaId}/ingredientes`)
       .pipe(catchError(this.handleError));
   }
 

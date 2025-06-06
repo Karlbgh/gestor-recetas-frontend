@@ -12,12 +12,18 @@ export interface UsuarioSimple {
 
 // Interfaz para los ingredientes dentro de una receta,
 // especificando cantidad y unidad.
-export interface IngredienteEnReceta {
-  ingredienteId: number | string; // ID del ingrediente
-  nombre?: string; // Nombre del ingrediente (puede venir del backend o poblarse)
+export interface RecetaIngrediente {
+  IdIngrediente: number;
+  nombre: string;
   cantidad: number;
   unidadMedida: string;
-  // ingrediente?: Ingrediente; // Opcional: Objeto Ingrediente completo si se anida
+  calorias: number;
+  grasas: number;
+  proteinas: number;
+  carbohidratos: number;
+  azucares: number;
+  sodio: number;
+
 }
 
 export interface Receta {
@@ -34,7 +40,7 @@ export interface Receta {
   creatorId?: number | string;
 
   // --- Campos para la vista de detalle ---
-  ingredientes?: IngredienteEnReceta[];
+  ingredientes?: RecetaIngrediente[];
   pasos?: string[];
   tiempoPreparacion?: number;
   nombreCreador?: string;
