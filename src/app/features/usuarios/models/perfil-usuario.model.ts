@@ -5,5 +5,5 @@ export interface PerfilUsuario {
   nombre: string;
   email: string;
   rol?: RolUsuario;
-  foto_perfil?: string;
+  fotoPerfil?: string;
 }

@@ -1,5 +1,3 @@
-// src/app/features/usuarios/page/perfil-page/perfil-page.component.ts
-
 import { Component, OnInit, inject, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -22,13 +20,11 @@ export class PerfilPageComponent implements OnInit {
   private perfilService = inject(PerfilUsuarioService);
   private authService = inject(AuthService);
 
-  // Señales para el estado del componente
   perfil: WritableSignal<PerfilUsuario | null> = signal(null);
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
-  // Formularios
   perfilForm = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
     email: [{ value: '', disabled: true }, [Validators.required, Validators.email]]
@@ -38,7 +34,6 @@ export class PerfilPageComponent implements OnInit {
     newPassword: ['', [Validators.required, Validators.minLength(6)]]
   });
 
-  // El avatarUrl ahora viene del estado centralizado en AuthService
   avatarUrl = this.authService.profileAvatarUrl;
 
   ngOnInit(): void {
@@ -49,6 +44,12 @@ export class PerfilPageComponent implements OnInit {
     this.isLoading.set(true);
 
     const idUser = this.authService.currentUser()?.id;
+    if (!idUser) {
+      this.errorMessage.set('No se pudo identificar al usuario.');
+      this.isLoading.set(false);
+      return;
+    }
+
     this.perfilService.getPerfil(idUser).subscribe({
       next: (data) => {
         this.perfil.set(data);
@@ -56,6 +57,7 @@ export class PerfilPageComponent implements OnInit {
           nombre: data.nombre,
           email: data.email
         });
+
         this.authService.updateProfileData(data);
         this.isLoading.set(false);
       },
@@ -77,11 +79,9 @@ export class PerfilPageComponent implements OnInit {
       const publicUrl = this.authService.getAvatarPublicUrl(path);
       if (!publicUrl) throw new Error('No se pudo obtener la URL pública del avatar.');
 
-      const perfilActualizado = await this.perfilService.updatePerfil({ foto_perfil: publicUrl }).toPromise();
+      await this.perfilService.updatePerfil({ fotoPerfil: publicUrl }).toPromise();
 
-      if(perfilActualizado) {
-         this.authService.updateProfileData({ foto_perfil: perfilActualizado.foto_perfil });
-      }
+      this.authService.loadUserProfile();
 
       this.showSuccess('¡Avatar actualizado con éxito!');
 
@@ -100,11 +100,9 @@ export class PerfilPageComponent implements OnInit {
     const nombre = this.perfilForm.value.nombre as string;
 
     try {
-      const perfilActualizado = await this.perfilService.updatePerfil({ nombre }).toPromise();
+      await this.perfilService.updatePerfil({ nombre }).toPromise();
 
-      if(perfilActualizado){
-         this.authService.updateProfileData({ nombre: perfilActualizado.nombre });
-      }
+      this.authService.loadUserProfile();
 
       this.showSuccess('Perfil actualizado con éxito.');
 
@@ -123,7 +121,6 @@ export class PerfilPageComponent implements OnInit {
     const newPassword = this.passwordForm.value.newPassword as string;
 
     try {
-      // La contraseña se maneja únicamente con Supabase Auth
       const { error } = await this.authService.updateUserPassword(newPassword);
       if (error) throw error;
 

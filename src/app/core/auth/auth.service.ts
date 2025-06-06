@@ -1,10 +1,9 @@
-// src/app/core/auth/auth.service.ts
-
 import { Injectable, signal, WritableSignal, inject, NgZone, computed, Signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { createClient, SupabaseClient, AuthChangeEvent, Session, User } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
 import { PerfilUsuarioService } from '../../features/usuarios/services/perfil-usuario.service';
+import { PerfilUsuario } from '../../features/usuarios/models/perfil-usuario.model';
 import { take } from 'rxjs/operators';
 
 @Injectable({
@@ -35,36 +34,57 @@ export class AuthService {
   public recoveryEventOccurred = this._recoveryEventOccurred.asReadonly();
 
 
- constructor() {
+constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+    console.log('[DEBUG] AuthService: Constructor inicializado.');
 
     this.supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('[DEBUG] AuthService: getSession completado.', session);
       this._updateAuthState(!!session, session);
       if (session) {
+        console.log('[DEBUG] AuthService: Sesión encontrada, llamando a loadUserProfile.');
         this.loadUserProfile();
       }
     });
 
     this.supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
+      console.log('[DEBUG] AuthService: onAuthStateChange evento:', event);
       this.ngZone.run(() => {
         this._updateAuthStateOnEvent(event, session);
       });
     });
   }
 
-  /**
-   * Carga el perfil del usuario desde el backend .NET y actualiza las signals locales.
-   */
   loadUserProfile(): void {
-    if (!this.isAuthenticated()) return;
+    console.log('[DEBUG] AuthService: Iniciando loadUserProfile...');
 
-    this.perfilUsuarioService.getPerfil(this.currentUser()?.id).pipe(take(1)).subscribe({
-      next: (perfil) => {
-        console.log('Perfil cargado:', perfil);
-        this._profileName.set(perfil.nombre);
-        this._profileAvatarUrl.set(perfil.foto_perfil || null);
+    if (!this.isAuthenticated()) {
+      console.warn('[DEBUG] AuthService: loadUserProfile detenido, usuario no autenticado.');
+      return;
+    }
+    const userId = this.currentUser()?.id;
+    console.log('[DEBUG] AuthService: ID de usuario para la consulta:', userId);
+
+    if (!userId) {
+      console.warn('[DEBUG] AuthService: loadUserProfile detenido, no se encontró ID de usuario.');
+      return;
+    }
+
+    this.perfilUsuarioService.getPerfil(userId).pipe(take(1)).subscribe({
+      next: (perfil: PerfilUsuario) => {
+        console.log('[DEBUG] AuthService: Perfil recibido del backend:', JSON.stringify(perfil, null, 2));
+
+        if (perfil && perfil.fotoPerfil) {
+          console.log('[DEBUG] AuthService: "foto_perfil" encontrado con valor:', perfil.fotoPerfil);
+        } else {
+          console.warn('[DEBUG] AuthService: "foto_perfil" NO encontrado o es nulo en el objeto de perfil recibido.');
+        }
+
+        this._profileName.set(perfil?.nombre || this.currentUser()?.email || 'Usuario');
+        this._profileAvatarUrl.set(perfil?.fotoPerfil || null);
       },
       error: (err) => {
+        console.error('[DEBUG] AuthService: ¡ERROR! La llamada a getPerfil ha fallado.', err);
         this._profileName.set(this.currentUser()?.email || 'Usuario');
         this._profileAvatarUrl.set(null);
       }
@@ -106,7 +126,7 @@ export class AuthService {
       case 'TOKEN_REFRESHED':
       case 'USER_UPDATED':
         this._updateAuthState(true, session);
-        this.loadUserProfile(); // Cargar perfil al iniciar sesión o actualizar
+        this.loadUserProfile();
         if (event === 'SIGNED_IN' && this.router.url.includes('/auth')) {
           this.router.navigate(['/']);
         }
@@ -114,7 +134,7 @@ export class AuthService {
 
       case 'SIGNED_OUT':
         this._updateAuthState(false, null);
-        this.clearUserProfile(); // Limpiar perfil al cerrar sesión
+        this.clearUserProfile();
         this._recoveryEventOccurred.set(false);
         this.router.navigate(['/']);
         break;
