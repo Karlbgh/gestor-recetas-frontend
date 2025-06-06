@@ -102,12 +102,12 @@ constructor() {
   /**
    * Permite a otros componentes (como la página de perfil) actualizar el estado del perfil.
    */
-  public updateProfileData(data: { nombre?: string, foto_perfil?: string }): void {
+  public updateProfileData(data: { nombre?: string, fotoPerfil?: string }): void {
       if (data.nombre) {
           this._profileName.set(data.nombre);
       }
-      if (data.foto_perfil) {
-          this._profileAvatarUrl.set(data.foto_perfil);
+      if (data.fotoPerfil) {
+          this._profileAvatarUrl.set(data.fotoPerfil);
       }
   }
 
