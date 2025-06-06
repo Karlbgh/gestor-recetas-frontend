@@ -212,4 +212,37 @@ constructor() {
     const { data } = this.supabase.storage.from('avatars').getPublicUrl(path);
     return data?.publicUrl || null;
   }
+
+  /**
+   * Elimina un archivo de avatar del storage de Supabase.
+   * @param path La ruta del archivo a eliminar dentro del bucket 'avatars'.
+   */
+  async deleteAvatar(path: string): Promise<{ error: any }> {
+    const { error } = await this.supabase.storage.from('avatars').remove([path]);
+    if (error) {
+      // Lo registramos como un error, pero no necesariamente detiene el flujo del usuario
+      console.error('Error al eliminar el avatar anterior de Supabase Storage:', error);
+    }
+    return { error };
+  }
+
+  /**
+   * Extrae la ruta del archivo de una URL pública de Supabase Storage.
+   * @param url La URL pública completa del archivo.
+   * @param bucketName El nombre del bucket donde se almacena el archivo (ej: 'avatars').
+   * @returns La ruta del archivo o null si no se puede extraer.
+   */
+  getPathFromUrl(url: string, bucketName: string): string | null {
+    if (!url) return null;
+    const searchString = `/storage/v1/object/public/${bucketName}/`;
+    const startIndex = url.indexOf(searchString);
+
+    if (startIndex === -1) {
+      console.warn('No se pudo encontrar el patrón del bucket en la URL del avatar antiguo.');
+      return null;
+    }
+
+    const path = url.substring(startIndex + searchString.length);
+    return path ? decodeURI(path) : null;
+  }
 }

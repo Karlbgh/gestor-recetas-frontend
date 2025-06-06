@@ -1,9 +1,10 @@
+// src/app/features/usuarios/services/perfil-usuario.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-import { PerfilUsuario } from '../models/perfil-usuario.model';
+import { PerfilUsuario, UpdatePerfilPayload } from '../models/perfil-usuario.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,19 +14,21 @@ export class PerfilUsuarioService {
   private apiUrl = `${environment.apiUrl}/PerfilUsuario`;
 
   /**
-   * Obtiene el perfil del usuario actualmente autenticado.
+   * Obtiene el perfil de un usuario por su ID.
+   * @param id El ID del usuario.
    */
-  getPerfil(id?:string): Observable<PerfilUsuario> {
+  getPerfil(id: string): Observable<PerfilUsuario> {
     return this.http.get<PerfilUsuario>(`${this.apiUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 
   /**
-   * Actualiza parcialmente el perfil del usuario.
-   * @param perfil El objeto con los datos a actualizar (puede ser parcial).
+   * Actualiza parcialmente el perfil del usuario (solo nombre y/o fotoPerfil).
+   * @param id El ID del usuario a actualizar.
+   * @param payload El objeto con los datos a actualizar.
    */
-  updatePerfil(perfil: Partial<PerfilUsuario>): Observable<PerfilUsuario> {
-    return this.http.put<PerfilUsuario>(this.apiUrl, perfil)
+  updatePerfil(id: string, payload: UpdatePerfilPayload): Observable<PerfilUsuario> {
+    return this.http.put<PerfilUsuario>(`${this.apiUrl}/${id}`, payload)
       .pipe(catchError(this.handleError));
   }
 

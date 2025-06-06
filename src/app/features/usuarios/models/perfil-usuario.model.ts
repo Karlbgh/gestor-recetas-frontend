@@ -7,3 +7,8 @@ export interface PerfilUsuario {
   rol?: RolUsuario;
   fotoPerfil?: string;
 }
+
+export interface UpdatePerfilPayload {
+  nombre?: string;
+  fotoPerfil?: string;
+}

@@ -1,3 +1,4 @@
+// src/app/features/usuarios/page/perfil-page/perfil-page.component.ts
 import { Component, OnInit, inject, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -72,17 +73,27 @@ export class PerfilPageComponent implements OnInit {
     this.clearMessages();
     this.isLoading.set(true);
 
+    const userId = this.authService.currentUser()?.id;
+    if (!userId) {
+        this.showError('No se pudo identificar al usuario para la actualización.');
+        this.isLoading.set(false);
+        return;
+    }
+
+    const oldAvatarUrl = this.perfil()?.fotoPerfil;
+    console.log(`Avatar antiguo: ${oldAvatarUrl}`);
     try {
+      if (oldAvatarUrl) {
+        const oldPath = this.authService.getPathFromUrl(oldAvatarUrl, 'avatars');
+        if (oldPath) {
+          console.log(`Intentando eliminar el avatar anterior en la ruta: ${oldPath}`);
+          await this.authService.deleteAvatar(oldPath);
+        }
+      }
       const { path, error: uploadError } = await this.authService.uploadAvatar(file);
       if (uploadError || !path) throw new Error(uploadError?.message || 'Error al subir el avatar.');
 
-      const publicUrl = this.authService.getAvatarPublicUrl(path);
-      if (!publicUrl) throw new Error('No se pudo obtener la URL pública del avatar.');
-
-      await this.perfilService.updatePerfil({ fotoPerfil: publicUrl }).toPromise();
-
       this.authService.loadUserProfile();
-
       this.showSuccess('¡Avatar actualizado con éxito!');
 
     } catch (e: any) {
@@ -97,13 +108,18 @@ export class PerfilPageComponent implements OnInit {
     this.clearMessages();
     this.isLoading.set(true);
 
+    const userId = this.authService.currentUser()?.id;
+    if (!userId) {
+        this.showError('No se pudo identificar al usuario para la actualización.');
+        this.isLoading.set(false);
+        return;
+    }
+
     const nombre = this.perfilForm.value.nombre as string;
-
+    console.log(`Actualizando perfil de usuario con nombre: ${nombre}`);
     try {
-      await this.perfilService.updatePerfil({ nombre }).toPromise();
-
+      await this.perfilService.updatePerfil(userId, { nombre}).toPromise();
       this.authService.loadUserProfile();
-
       this.showSuccess('Perfil actualizado con éxito.');
 
     } catch (e: any) {
