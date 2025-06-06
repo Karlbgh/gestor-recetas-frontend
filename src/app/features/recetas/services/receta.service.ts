@@ -28,9 +28,20 @@ export class RecetaService {
     );
   }
 
-  // Obtener una receta por ID
+  // Obtener una receta por ID de receta
   getRecetaById(id: string): Observable<Receta> {
     return this.http.get<Receta>(`${this.apiUrl}/${id}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Obtiene todas las recetas creadas por un usuario específico.
+   * @param usuarioId El ID del usuario.
+   * @returns Un Observable con un array de Recetas.
+   */
+  getRecetasByUsuario(usuarioId: string): Observable<Receta[]> {
+    // Se utiliza el endpoint GET /api/Recetas/{id}, donde {id} es el ID del usuario.
+    return this.http.get<Receta[]>(`${this.apiUrl}/usuario/${usuarioId}`)
       .pipe(catchError(this.handleError));
   }
 

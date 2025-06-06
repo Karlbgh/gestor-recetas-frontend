@@ -1,0 +1,56 @@
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <header class="mb-8 md:mb-12">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">
+      Mis Recetas
+    </h1>
+    <p class="mt-3 text-base sm:text-lg text-gray-600">
+      Aquí puedes ver y gestionar todas las recetas que has creado.
+    </p>
+  </header>
+
+  @if (isLoading()) {
+    <div class="text-center py-12">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-sky-500 mx-auto"></div>
+      <p class="mt-4 text-lg text-sky-600 font-semibold">Cargando tus recetas...</p>
+    </div>
+  }
+  @else if (errorMensaje()) {
+     <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-md shadow-md" role="alert">
+      <p class="font-bold">Error</p>
+      <p>{{ errorMensaje() }}</p>
+    </div>
+  }
+  @else if (recetas().length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-8">
+      @for (receta of recetas(); track receta.id) {
+        <div class="flex flex-col h-full">
+          <app-recipe-card
+            class="flex-grow"
+            [receta]="receta"
+            (verDetalle)="onVerDetalleReceta($event)">
+          </app-recipe-card>
+          <div class="flex items-center justify-center gap-2 p-2 bg-gray-50 rounded-b-xl border-t border-gray-200">
+             <button (click)="onEditarReceta(receta.id)" class="text-sm font-medium text-sky-600 hover:text-sky-800 transition">Editar</button>
+             <span class="text-gray-300">|</span>
+             <button (click)="onEliminarReceta(receta.id)" class="text-sm font-medium text-red-600 hover:text-red-800 transition">Eliminar</button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+       <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+        </svg>
+      <h3 class="mt-2 text-xl font-semibold text-gray-700">Aún no has creado ninguna receta</h3>
+      <p class="mt-1 text-sm text-gray-500">
+        ¡Anímate y comparte tu primera creación culinaria!
+      </p>
+      <div class="mt-6">
+        <button (click)="navigateToCreateRecipe()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Crear Nueva Receta
+        </button>
+      </div>
+    </div>
+  }
+</div>
