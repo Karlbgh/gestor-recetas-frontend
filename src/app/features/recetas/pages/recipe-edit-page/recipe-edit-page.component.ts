@@ -263,7 +263,6 @@ export class RecipeEditPageComponent implements OnInit {
 
     if (file) {
         try {
-
             const oldImageUrl = this.originalImageUrl();
             console.log(`URL de imagen antigua: ${oldImageUrl}`);
             if (oldImageUrl) {
@@ -287,7 +286,16 @@ export class RecipeEditPageComponent implements OnInit {
             return;
         }
     }
+    else{
+        const oldImageUrl = this.originalImageUrl();
+        if (oldImageUrl) {
+            receta.imagen = oldImageUrl;
+        } else {
+            delete receta.imagen;
+        }
+    }
 
+    console.log('Datos de la receta a actualizar:', receta);
     this.recetaService.updateReceta(id, receta).subscribe({
         next: () => {
             this.notificationService.show('¡Receta actualizada con éxito!', 'success');
