@@ -1,3 +1,4 @@
+// src/app/features/recetas/pages/recipe-edit-page/recipe-edit-page.component.ts
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -36,6 +37,12 @@ export class RecipeEditPageComponent implements OnInit {
   imagePreview = signal<string | null>(null);
   selectedFile = signal<File | null>(null);
 
+  // --- Inicio: Propiedades para el nuevo autocompletado ---
+  private allIngredients = signal<Ingrediente[]>([]); // Almacena la lista completa
+  ingredientesSugeridos = signal<Ingrediente[]>([]);   // Almacena las sugerencias filtradas
+  activeIngredientIndex = signal<number | null>(null);
+  // --- Fin: Propiedades para el nuevo autocompletado ---
+
   constructor() {
     this.recipeForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
@@ -49,6 +56,7 @@ export class RecipeEditPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Carga los datos de la receta si estamos en modo edición
     this.route.paramMap.pipe(
       tap(params => {
         this.recetaId = params.get('id');
@@ -62,7 +70,61 @@ export class RecipeEditPageComponent implements OnInit {
         }
       })
     ).subscribe();
+
+    // Carga TODOS los ingredientes al iniciar el componente para el autocompletado
+    this.ingredienteService.getIngredientes().subscribe(ingredientes => {
+        this.allIngredients.set(ingredientes);
+    });
   }
+
+  // --- Inicio: Nuevos métodos para el autocompletado ---
+
+  /**
+   * Se activa cuando el usuario hace foco en un campo de ingrediente.
+   * Muestra la lista completa de ingredientes como sugerencia inicial.
+   */
+  onIngredientFocus(index: number): void {
+    this.activeIngredientIndex.set(index);
+    this.ingredientesSugeridos.set(this.allIngredients());
+  }
+
+  /**
+   * Se activa al escribir en el campo. Filtra la lista local de ingredientes.
+   */
+  onIngredientNameChange(event: Event): void {
+    const term = (event.target as HTMLInputElement).value.toLowerCase();
+
+    if (!term) {
+      this.ingredientesSugeridos.set(this.allIngredients()); // Si no hay término, mostrar todos
+    } else {
+      const filtered = this.allIngredients().filter(ing =>
+        ing.nombre.toLowerCase().includes(term)
+      );
+      this.ingredientesSugeridos.set(filtered);
+    }
+  }
+
+  /**
+   * Se llama al seleccionar una sugerencia.
+   */
+  selectIngrediente(ingrediente: Ingrediente, index: number): void {
+    const ingredienteFormGroup = this.ingredientes.at(index) as FormGroup;
+    ingredienteFormGroup.patchValue({
+      idIngrediente: ingrediente.id,
+      nombre: ingrediente.nombre
+    });
+    this.hideSuggestions();
+  }
+
+  /**
+   * Oculta la lista de sugerencias, por ejemplo, al perder el foco.
+   */
+  hideSuggestions(): void {
+    setTimeout(() => {
+        this.activeIngredientIndex.set(null);
+    }, 150);
+  }
+  // --- Fin: Nuevos métodos para el autocompletado ---
 
   loadRecetaData(id: string): void {
     this.recetaService.getRecetaById(id).pipe(
@@ -157,10 +219,8 @@ export class RecipeEditPageComponent implements OnInit {
 
 
     if (this.isEditMode() && this.recetaId) {
-      console.log('Actualizando receta con ID:', this.recetaId);
       this.updateRecipe(this.recetaId, payload);
     } else {
-      console.log('Creando nueva receta');
       this.createRecipe(payload);
     }
   }
@@ -177,7 +237,6 @@ export class RecipeEditPageComponent implements OnInit {
                     const imageUrl = this.authService.getRecetaImagePublicUrl(path!);
                     const updatePayload: Partial<Receta> = { imagen: imageUrl };
 
-                    console.log('Actualizando receta con imagen:', updatePayload);
                     this.recetaService.updateReceta(newRecipe.idReceta.toString(), updatePayload as Receta).subscribe({
                         next: () => {
                             this.notificationService.show('¡Receta creada con éxito!', 'success');
