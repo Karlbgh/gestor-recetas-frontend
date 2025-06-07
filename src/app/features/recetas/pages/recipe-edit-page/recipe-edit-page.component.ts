@@ -11,11 +11,16 @@ import { RecetaService } from '../../services/receta.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { IngredienteService } from '../../../ingredientes/services/ingrediente.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
+import { QuillModule } from 'ngx-quill'; // 1. Importar QuillModule
 
 @Component({
   selector: 'app-recipe-edit-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    QuillModule // 2. Añadir QuillModule a los imports
+  ],
   templateUrl: './recipe-edit-page.component.html',
   styleUrls: ['./recipe-edit-page.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,13 +41,11 @@ export class RecipeEditPageComponent implements OnInit {
   recetaId: string | null = null;
   imagePreview = signal<string | null>(null);
   selectedFile = signal<File | null>(null);
-  private originalImageUrl = signal<string | null>(null); // <-- AÑADIDO: Para guardar la URL original
+  private originalImageUrl = signal<string | null>(null);
 
-  // --- Inicio: Propiedades para el nuevo autocompletado ---
-  private allIngredients = signal<Ingrediente[]>([]); // Almacena la lista completa
-  ingredientesSugeridos = signal<Ingrediente[]>([]);   // Almacena las sugerencias filtradas
+  private allIngredients = signal<Ingrediente[]>([]);
+  ingredientesSugeridos = signal<Ingrediente[]>([]);
   activeIngredientIndex = signal<number | null>(null);
-  // --- Fin: Propiedades para el nuevo autocompletado ---
 
   constructor() {
     this.recipeForm = this.fb.group({
@@ -57,7 +60,6 @@ export class RecipeEditPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Carga los datos de la receta si estamos en modo edición
     this.route.paramMap.pipe(
       tap(params => {
         this.recetaId = params.get('id');
@@ -72,31 +74,21 @@ export class RecipeEditPageComponent implements OnInit {
       })
     ).subscribe();
 
-    // Carga TODOS los ingredientes al iniciar el componente para el autocompletado
     this.ingredienteService.getIngredientes().subscribe(ingredientes => {
         this.allIngredients.set(ingredientes);
     });
   }
 
-  // --- Inicio: Nuevos métodos para el autocompletado ---
-
-  /**
-   * Se activa cuando el usuario hace foco en un campo de ingrediente.
-   * Muestra la lista completa de ingredientes como sugerencia inicial.
-   */
   onIngredientFocus(index: number): void {
     this.activeIngredientIndex.set(index);
     this.ingredientesSugeridos.set(this.allIngredients());
   }
 
-  /**
-   * Se activa al escribir en el campo. Filtra la lista local de ingredientes.
-   */
   onIngredientNameChange(event: Event): void {
     const term = (event.target as HTMLInputElement).value.toLowerCase();
 
     if (!term) {
-      this.ingredientesSugeridos.set(this.allIngredients()); // Si no hay término, mostrar todos
+      this.ingredientesSugeridos.set(this.allIngredients());
     } else {
       const filtered = this.allIngredients().filter(ing =>
         ing.nombre.toLowerCase().includes(term)
@@ -105,9 +97,6 @@ export class RecipeEditPageComponent implements OnInit {
     }
   }
 
-  /**
-   * Se llama al seleccionar una sugerencia.
-   */
   selectIngrediente(ingrediente: Ingrediente, index: number): void {
     const ingredienteFormGroup = this.ingredientes.at(index) as FormGroup;
     ingredienteFormGroup.patchValue({
@@ -117,20 +106,16 @@ export class RecipeEditPageComponent implements OnInit {
     this.hideSuggestions();
   }
 
-  /**
-   * Oculta la lista de sugerencias, por ejemplo, al perder el foco.
-   */
   hideSuggestions(): void {
     setTimeout(() => {
         this.activeIngredientIndex.set(null);
     }, 150);
   }
-  // --- Fin: Nuevos métodos para el autocompletado ---
 
   loadRecetaData(id: string): void {
     this.recetaService.getRecetaById(id).pipe(
       switchMap(receta => {
-        this.originalImageUrl.set(receta.imagen || null); // <-- AÑADIDO: Guardamos la URL
+        this.originalImageUrl.set(receta.imagen || null);
         this.imagePreview.set(receta.imagen || null);
         this.recipeForm.patchValue(receta);
         return this.recetaService.getIngredientesPorReceta(id);

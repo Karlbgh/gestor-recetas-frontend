@@ -1,1 +1,19 @@
+@import "quill/dist/quill.snow.css";
 @import "tailwindcss";
+
+
+app-recipe-detail-page .ql-editor {
+
+  overflow-wrap: break-word;
+  word-wrap: break-word; /* Compatibilidad con navegadores antiguos */
+  word-break: normal;
+
+  text-align: left !important;
+  -webkit-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+app-recipe-detail-page .ql-editor p {
+    text-align: left !important;
+}
