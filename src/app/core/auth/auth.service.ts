@@ -91,9 +91,6 @@ constructor() {
     });
   }
 
-  /**
-   * Limpia los datos del perfil al cerrar sesión.
-   */
   private clearUserProfile(): void {
     this._profileName.set(null);
     this._profileAvatarUrl.set(null);
@@ -111,7 +108,6 @@ constructor() {
       }
   }
 
-
   private _updateAuthState(isAuthenticated: boolean, session: Session | null) {
     this._isAuthenticated.set(isAuthenticated);
     this._currentUser.set(session?.user ?? null);
@@ -119,8 +115,6 @@ constructor() {
   }
 
   private _updateAuthStateOnEvent(event: AuthChangeEvent, session: Session | null) {
-    //('Auth state change:', event, session);
-
     switch (event) {
       case 'SIGNED_IN':
       case 'TOKEN_REFRESHED':
@@ -236,11 +230,18 @@ constructor() {
   }
 
   async uploadRecetaImage(file: File, recetaId: string | number): Promise<{ path: string | null; error: any }> {
+    const user = this.currentUser();
+    if (!user) {
+      return { path: null, error: 'Usuario no autenticado para subir imagen de receta.' };
+    }
+
     const fileExt = file.name.split('.').pop();
-    const filePath = `${recetaId}/cover.${fileExt}`;
+
+    const filePath = `${user.id}/${recetaId}/${Date.now()}.${fileExt}`;
+    console.log('Subiendo imagen de receta a la ruta:', filePath);
 
     const { error } = await this.supabase.storage.from('imagen-receta').upload(filePath, file, {
-        upsert: true
+      upsert: true
     });
 
     if (error) {

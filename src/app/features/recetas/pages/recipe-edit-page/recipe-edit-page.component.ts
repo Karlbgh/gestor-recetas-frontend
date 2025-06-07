@@ -36,6 +36,7 @@ export class RecipeEditPageComponent implements OnInit {
   recetaId: string | null = null;
   imagePreview = signal<string | null>(null);
   selectedFile = signal<File | null>(null);
+  private originalImageUrl = signal<string | null>(null); // <-- AÑADIDO: Para guardar la URL original
 
   // --- Inicio: Propiedades para el nuevo autocompletado ---
   private allIngredients = signal<Ingrediente[]>([]); // Almacena la lista completa
@@ -129,6 +130,7 @@ export class RecipeEditPageComponent implements OnInit {
   loadRecetaData(id: string): void {
     this.recetaService.getRecetaById(id).pipe(
       switchMap(receta => {
+        this.originalImageUrl.set(receta.imagen || null); // <-- AÑADIDO: Guardamos la URL
         this.imagePreview.set(receta.imagen || null);
         this.recipeForm.patchValue(receta);
         return this.recetaService.getIngredientesPorReceta(id);
@@ -258,11 +260,28 @@ export class RecipeEditPageComponent implements OnInit {
 
   private async updateRecipe(id: string, receta: Receta): Promise<void> {
     const file = this.selectedFile();
+
     if (file) {
         try {
+
+            const oldImageUrl = this.originalImageUrl();
+            console.log(`URL de imagen antigua: ${oldImageUrl}`);
+            if (oldImageUrl) {
+                const oldImagePath = this.authService.getPathFromUrl(oldImageUrl, 'imagen-receta');
+                if (oldImagePath) {
+                    console.log(`Eliminando imagen antigua: ${oldImagePath}`);
+                    const { error: deleteError } = await this.authService.deleteRecetaImage(oldImagePath);
+                    if (deleteError) {
+                       console.warn("No se pudo eliminar la imagen antigua, se procederá a subir la nueva de todas formas.", deleteError);
+                    }
+                }
+            }
+
             const { path, error: uploadError } = await this.authService.uploadRecetaImage(file, id);
             if (uploadError) throw uploadError;
+
             receta.imagen = this.authService.getRecetaImagePublicUrl(path!);
+
         } catch (e) {
             this.handleError(e, "actualizar la imagen");
             return;
