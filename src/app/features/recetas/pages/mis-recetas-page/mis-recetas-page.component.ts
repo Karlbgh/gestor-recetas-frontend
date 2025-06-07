@@ -1,4 +1,3 @@
-// src/app/features/recetas/pages/mis-recetas-page/mis-recetas-page.component.ts
 import { Component, OnInit, inject, signal, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -85,19 +84,36 @@ export class MisRecetasPageComponent implements OnInit {
     this.recetaAEliminar.set(null);
   }
 
-  confirmDelete(): void {
+  async confirmDelete(): Promise<void> {
     const receta = this.recetaAEliminar();
     if (!receta) {
       return;
     }
 
     this.isLoading.set(true);
-    console.log(`Eliminando receta: ${receta.idReceta}`);
+
+    if (receta.imagen) {
+      const imagePath = this.authService.getPathFromUrl(receta.imagen, 'imagen-receta');
+      if (imagePath) {
+        try {
+          const { error } = await this.authService.deleteRecetaImage(imagePath);
+          if (error) {
+            console.warn('No se pudo eliminar la imagen de la receta. Se procederá a eliminar la receta de la base de datos.', error);
+            this.notificationService.show('Advertencia: No se pudo eliminar el archivo de imagen.', 'error');
+          } else {
+            // console.log('Imagen de receta eliminada con éxito del storage.');
+          }
+        } catch (e) {
+          console.error('Excepción al intentar eliminar la imagen de la receta:', e);
+        }
+      }
+    }
+
+    console.log(`Eliminando receta de la base de datos: ${receta.idReceta}`);
     this.recetaService.deleteReceta(receta.idReceta.toString()).subscribe({
       next: () => {
         this.recetas.update(recetas => recetas.filter(r => r.idReceta !== receta.idReceta));
         this.notificationService.show('Receta eliminada con éxito', 'success');
-        this.isLoading.set(false);
       },
       error: (error: HttpErrorResponse | Error) => {
         console.error('Error al eliminar la receta:', error);
@@ -106,10 +122,12 @@ export class MisRecetasPageComponent implements OnInit {
         this.isLoading.set(false);
       },
       complete: () => {
+        this.isLoading.set(false);
         this.cancelDelete();
       }
     });
   }
+
 
   navigateToCreateRecipe(): void {
     this.router.navigate(['/recetas/nueva']);
