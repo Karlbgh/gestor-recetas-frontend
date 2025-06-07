@@ -11,7 +11,7 @@ import { RecetaService } from '../../services/receta.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { IngredienteService } from '../../../ingredientes/services/ingrediente.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
-import { QuillModule } from 'ngx-quill'; // 1. Importar QuillModule
+import { QuillModule } from 'ngx-quill';
 
 @Component({
   selector: 'app-recipe-edit-page',
@@ -19,7 +19,7 @@ import { QuillModule } from 'ngx-quill'; // 1. Importar QuillModule
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    QuillModule // 2. Añadir QuillModule a los imports
+    QuillModule
   ],
   templateUrl: './recipe-edit-page.component.html',
   styleUrls: ['./recipe-edit-page.component.scss'],
@@ -97,7 +97,12 @@ export class RecipeEditPageComponent implements OnInit {
     }
   }
 
-  selectIngrediente(ingrediente: Ingrediente, index: number): void {
+  selectIngrediente(ingrediente: Ingrediente): void {
+    const index = this.activeIngredientIndex();
+    if (index === null) {
+      return;
+    }
+
     const ingredienteFormGroup = this.ingredientes.at(index) as FormGroup;
     ingredienteFormGroup.patchValue({
       idIngrediente: ingrediente.id,
@@ -174,6 +179,8 @@ export class RecipeEditPageComponent implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
+    console.log('Formulario enviado:', this.recipeForm.value);
+    console.log('this.recipeForm.invalid:', this.recipeForm.invalid);
     if (this.recipeForm.invalid) {
       this.notificationService.show('El formulario no es válido. Revisa los campos.', 'error');
       this.recipeForm.markAllAsTouched();
