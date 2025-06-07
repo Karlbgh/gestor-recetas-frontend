@@ -88,7 +88,7 @@ export class RecipeEditPageComponent implements OnInit {
 
   createIngredienteGroup(ingrediente: RecetaIngrediente | null = null): FormGroup {
     return this.fb.group({
-      idIngrediente: [ingrediente?.IdIngrediente || null, Validators.required],
+      idIngrediente: [ingrediente?.idIngrediente || null],
       nombre: [ingrediente?.nombre || '', Validators.required],
       cantidad: [ingrediente?.cantidad || 1, [Validators.required, Validators.min(0.1)]],
       unidadMedida: [ingrediente?.unidadMedida || 'gr', Validators.required],
@@ -149,6 +149,7 @@ export class RecipeEditPageComponent implements OnInit {
 
     payload.Ingredientes = payload.ingredientes.map((ing: any) => ({
         idIngrediente: ing.idIngrediente,
+        nombre: ing.nombre,
         cantidad: ing.cantidad,
         unidadMedida: ing.unidadMedida
     }));
@@ -156,10 +157,10 @@ export class RecipeEditPageComponent implements OnInit {
 
 
     if (this.isEditMode() && this.recetaId) {
-
+      console.log('Actualizando receta con ID:', this.recetaId);
       this.updateRecipe(this.recetaId, payload);
     } else {
-
+      console.log('Creando nueva receta');
       this.createRecipe(payload);
     }
   }
@@ -176,10 +177,11 @@ export class RecipeEditPageComponent implements OnInit {
                     const imageUrl = this.authService.getRecetaImagePublicUrl(path!);
                     const updatePayload: Partial<Receta> = { imagen: imageUrl };
 
+                    console.log('Actualizando receta con imagen:', updatePayload);
                     this.recetaService.updateReceta(newRecipe.idReceta.toString(), updatePayload as Receta).subscribe({
-                        next: (updatedRecipe) => {
+                        next: () => {
                             this.notificationService.show('¡Receta creada con éxito!', 'success');
-                            this.router.navigate(['/recetas', updatedRecipe.idReceta]);
+                            this.router.navigate(['/recetas', newRecipe.idReceta]);
                         },
                         error: (err) => this.handleError(err, "actualizar la receta con la imagen")
                     });
@@ -209,9 +211,9 @@ export class RecipeEditPageComponent implements OnInit {
     }
 
     this.recetaService.updateReceta(id, receta).subscribe({
-        next: (updatedRecipe) => {
+        next: () => {
             this.notificationService.show('¡Receta actualizada con éxito!', 'success');
-            this.router.navigate(['/recetas', updatedRecipe.idReceta]);
+            this.router.navigate(['/recetas', id]);
         },
         error: (err) => this.handleError(err, "actualizar la receta")
     });

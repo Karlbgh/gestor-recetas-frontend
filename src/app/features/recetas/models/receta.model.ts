@@ -8,7 +8,7 @@ export interface UsuarioSimple {
 }
 
 export interface RecetaIngrediente {
-  IdIngrediente: number;
+  idIngrediente: number;
   nombre: string;
   cantidad: number;
   unidadMedida: string;

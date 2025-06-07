@@ -1,3 +1,5 @@
+// src/app/features/recetas/services/receta.service.ts
+
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
@@ -59,8 +61,12 @@ export class RecetaService {
   }
 
   // Actualizar una receta existente
-  updateReceta(id: string, receta: Receta): Observable<Receta> {
-    return this.http.put<Receta>(`${this.apiUrl}/${id}`, receta)
+  updateReceta(id: string, receta: Receta): Observable<void> { // <-- CAMBIO 1: El tipo de retorno ahora es Observable<void>
+    const urlFinal = `${this.apiUrl}/${id}`;
+    console.log(`Actualizando receta en: ${urlFinal}`);
+    console.log('Datos de la receta a actualizar:', receta);
+    // <-- CAMBIO 2: No se especifica un tipo genérico en put(), o se usa <void>
+    return this.http.put<void>(urlFinal, receta)
       .pipe(catchError(this.handleError));
   }
 
