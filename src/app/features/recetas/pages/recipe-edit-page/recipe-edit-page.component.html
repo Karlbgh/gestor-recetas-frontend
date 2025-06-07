@@ -60,7 +60,7 @@
 
       <div formArrayName="ingredientes">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Ingredientes</h3>
-        @for (ingredienteGroup of ingredientes.controls; track $index) {
+        @for (ingredienteGroup of ingredientes.controls; track ingredienteGroup) {
           <div [formGroupName]="$index" class="grid grid-cols-1 md:grid-cols-10 gap-3 items-center mb-4 p-3 border rounded">
             <div class="md:col-span-4">
               <label class="block text-xs font-medium text-gray-600">Ingrediente</label>
