@@ -1,4 +1,3 @@
-// src/app/features/recetas/pages/recipe-edit-page/recipe-edit-page.component.ts
 import { Component, OnInit, inject, signal, ChangeDetectionStrategy, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -227,11 +226,13 @@ export class RecipeEditPageComponent implements OnInit {
                 try {
                     const { path, error: uploadError } = await this.authService.uploadRecetaImage(file, newRecipe.idReceta);
                     if (uploadError) throw uploadError;
-
                     const imageUrl = this.authService.getRecetaImagePublicUrl(path!);
-                    const updatePayload: Partial<Receta> = { imagen: imageUrl };
+                    const recetaConImagen: Receta = {
+                      ...newRecipe,
+                      imagen: imageUrl,
+                    };
 
-                    this.recetaService.updateReceta(newRecipe.idReceta.toString(), updatePayload as Receta).subscribe({
+                    this.recetaService.updateReceta(newRecipe.idReceta.toString(), recetaConImagen).subscribe({
                         next: () => {
                             this.notificationService.show('¡Receta creada con éxito!', 'success');
                             this.router.navigate(['/recetas', newRecipe.idReceta]);
