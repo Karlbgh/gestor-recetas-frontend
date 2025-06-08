@@ -24,7 +24,7 @@ export class SocialAuthButtonsComponent {
       //console.log('AuthService instance in SocialAuthButtonsComponent:', this.authService);
 
       if (!this.authService) {
-        console.error('AuthService no está inyectado o no está disponible.');
+        // console.error('AuthService no está inyectado o no está disponible.');
         this.errorMessageGoogle.set('Error interno: Servicio de autenticación no disponible.');
         this.isLoadingGoogle.set(false);
         return;
@@ -36,7 +36,7 @@ export class SocialAuthButtonsComponent {
       // este componente podría ser destruido y recreado.
       // Si signInWithGoogle lanza un error antes de la redirección, se captura abajo.
     } catch (error: any) {
-      console.error('Error al intentar iniciar sesión con Google desde el componente:', error);
+      // console.error('Error al intentar iniciar sesión con Google desde el componente:', error);
       this.errorMessageGoogle.set(error.message || 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.');
       this.isLoadingGoogle.set(false);
     }

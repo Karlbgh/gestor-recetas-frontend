@@ -41,7 +41,7 @@ export class PlanificadorService {
   // }
 
   private handleError(error: HttpErrorResponse) {
-    console.error('Ocurrió un error en el servicio de Planificador:', error);
+    // console.error('Ocurrió un error en el servicio de Planificador:', error);s
     return throwError(() => new Error('Error en PlanificadorService: ' + error.message));
   }
 }

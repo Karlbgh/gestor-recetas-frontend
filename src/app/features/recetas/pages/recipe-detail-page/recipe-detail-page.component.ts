@@ -45,7 +45,7 @@ export class RecipeDetailPageComponent implements OnInit {
             recetaData.ingredientes = ingredientes;
             const recetaCalculada = this.calcularValoresNutricionales(recetaData);
             this.receta.set(recetaCalculada);
-            console.log('Receta completa con ingredientes y valores calculados:', recetaCalculada);
+            // console.log('Receta completa con ingredientes y valores calculados:', recetaCalculada);
           })
         );
       })
@@ -105,7 +105,7 @@ export class RecipeDetailPageComponent implements OnInit {
   private handleError(message: string): void {
     this.errorMessage.set(message);
     this.isLoading.set(false);
-    console.error(message);
+    // console.error(message);
   }
 
   getDificultadClass(dificultad: string): string {

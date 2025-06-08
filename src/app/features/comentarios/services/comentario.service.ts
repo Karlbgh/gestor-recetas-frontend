@@ -26,7 +26,7 @@ export class ComentarioService {
   // updateComentario, deleteComentario si son necesarios...
 
   private handleError(error: HttpErrorResponse) {
-    console.error('Ocurrió un error en el servicio de Comentarios:', error);
+    // console.error('Ocurrió un error en el servicio de Comentarios:', error);
     return throwError(() => new Error('Error en ComentarioService: ' + error.message));
   }
 }

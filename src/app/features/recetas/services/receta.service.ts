@@ -20,7 +20,7 @@ export class RecetaService {
   }
 
   getRecetas(): Observable<Receta[]> {
-    console.log(`Solicitando todas las recetas desde Supabase con datos del creador`);
+    // console.log(`Solicitando todas las recetas desde Supabase con datos del creador`);
     const promise = this.supabase
       .from('receta')
       .select(`
@@ -48,7 +48,7 @@ export class RecetaService {
   }
 
   searchRecetas(termino: string): Observable<Receta[]> {
-    console.log(`Buscando recetas en Supabase con el término: "${termino}"`);
+    // console.log(`Buscando recetas en Supabase con el término: "${termino}"`);
     const promise = this.supabase.rpc('search_recipes', { search_term: termino });
 
     return from(promise).pipe(
@@ -98,12 +98,12 @@ export class RecetaService {
   }
 
   private handleSupabaseError(error: any) {
-    console.error('Ocurrió un error en la llamada a Supabase:', error);
+    // console.error('Ocurrió un error en la llamada a Supabase:', error);
     return throwError(() => new Error(error.message || 'Error desconocido del servidor de Supabase.'));
   }
 
   private handleHttpError(error: HttpErrorResponse) {
-    console.error('Ocurrió un error en el servicio HTTP de Recetas:', error);
+    // console.error('Ocurrió un error en el servicio HTTP de Recetas:', error);
     let errorMessage = 'Algo salió mal; por favor, inténtalo de nuevo más tarde.';
     if (error.error instanceof ErrorEvent) {
       errorMessage = `Error: ${error.error.message}`;

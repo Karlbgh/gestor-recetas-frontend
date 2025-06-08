@@ -56,14 +56,14 @@ export class LoginFormComponent {
         else {
           this.errorMessage.set(`Error: ${error.message || 'No se pudo iniciar sesión. Inténtalo de nuevo.'}`);
         }
-        console.error('Error en el componente de login:', error);
+        // console.error('Error en el componente de login:', error);
       } else if (user && session) {
         // La redirección y actualización de estado ya la maneja el onAuthStateChange del servicio
       } else {
         this.errorMessage.set('Respuesta inesperada del servidor de autenticación.');
       }
     } catch (e: any) {
-      console.error('Excepción durante el login:', e);
+      // console.error('Excepción durante el login:', e);
       this.errorMessage.set(e.message || 'Ocurrió un error inesperado.');
     } finally {
       this.isLoading.set(false);

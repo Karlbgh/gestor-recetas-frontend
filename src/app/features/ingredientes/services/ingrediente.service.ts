@@ -25,7 +25,7 @@ export class IngredienteService {
   // El método searchIngredientes ya no es necesario, ya que filtraremos en el cliente.
 
   private handleError(error: HttpErrorResponse) {
-    console.error('Ocurrió un error en el servicio de Ingredientes:', error);
+    // console.error('Ocurrió un error en el servicio de Ingredientes:', error);
     return throwError(() => new Error('Error en IngredienteService: ' + error.message));
   }
 }

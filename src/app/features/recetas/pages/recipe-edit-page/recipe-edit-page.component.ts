@@ -178,8 +178,8 @@ export class RecipeEditPageComponent implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
-    console.log('Formulario enviado:', this.recipeForm.value);
-    console.log('this.recipeForm.invalid:', this.recipeForm.invalid);
+    // console.log('Formulario enviado:', this.recipeForm.value);
+    // console.log('this.recipeForm.invalid:', this.recipeForm.invalid);
     if (this.recipeForm.invalid) {
       this.notificationService.show('El formulario no es válido. Revisa los campos.', 'error');
       this.recipeForm.markAllAsTouched();
@@ -257,14 +257,14 @@ export class RecipeEditPageComponent implements OnInit {
     if (file) {
         try {
             const oldImageUrl = this.originalImageUrl();
-            console.log(`URL de imagen antigua: ${oldImageUrl}`);
+            // console.log(`URL de imagen antigua: ${oldImageUrl}`);
             if (oldImageUrl) {
                 const oldImagePath = this.authService.getPathFromUrl(oldImageUrl, 'imagen-receta');
                 if (oldImagePath) {
-                    console.log(`Eliminando imagen antigua: ${oldImagePath}`);
+                    // console.log(`Eliminando imagen antigua: ${oldImagePath}`);
                     const { error: deleteError } = await this.authService.deleteRecetaImage(oldImagePath);
                     if (deleteError) {
-                       console.warn("No se pudo eliminar la imagen antigua, se procederá a subir la nueva de todas formas.", deleteError);
+                      //  console.warn("No se pudo eliminar la imagen antigua, se procederá a subir la nueva de todas formas.", deleteError);
                     }
                 }
             }
@@ -288,7 +288,7 @@ export class RecipeEditPageComponent implements OnInit {
         }
     }
 
-    console.log('Datos de la receta a actualizar:', receta);
+    // console.log('Datos de la receta a actualizar:', receta);
     this.recetaService.updateReceta(id, receta).subscribe({
         next: () => {
             this.notificationService.show('¡Receta actualizada con éxito!', 'success');
@@ -299,7 +299,7 @@ export class RecipeEditPageComponent implements OnInit {
   }
 
   private handleError(error: any, context: string): void {
-    console.error(`Error al ${context}:`, error);
+    // console.error(`Error al ${context}:`, error);s
     this.notificationService.show(`Error al ${context}. Inténtalo de nuevo.`, 'error');
     this.isLoading.set(false);
   }

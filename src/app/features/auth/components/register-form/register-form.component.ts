@@ -82,7 +82,7 @@ export class RegisterFormComponent {
         this.registerForm.reset();
       }
     } catch (e: any) {
-      console.error('Excepción durante el registro:', e);
+      // console.error('Excepción durante el registro:', e);
       this.errorMessage.set(e.message || 'Ocurrió un error inesperado durante el registro.');
     } finally {
       this.isLoading.set(false);

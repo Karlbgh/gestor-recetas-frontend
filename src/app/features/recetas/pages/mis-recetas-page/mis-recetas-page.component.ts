@@ -53,7 +53,7 @@ export class MisRecetasPageComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error: HttpErrorResponse | Error) => {
-        console.error('Error al cargar mis recetas:', error);
+        // console.error('Error al cargar mis recetas:', error);
         this.errorMensaje.set('No se pudieron cargar tus recetas. Inténtalo de nuevo más tarde.');
         this.isLoading.set(false);
       },
@@ -72,10 +72,10 @@ export class MisRecetasPageComponent implements OnInit {
    * @param recetaId El ID de la receta a eliminar.
    */
   onEliminarReceta(recetaId: string | number): void {
-    console.log('this.recetas():', this.recetas());
+    // console.log('this.recetas():', this.recetas());
     const receta = this.recetas().find(r => r.idReceta === recetaId) || null;
     this.recetaAEliminar.set(receta);
-    console.log('Preparando para eliminar receta: ',receta);
+    // console.log('Preparando para eliminar receta: ',receta);
     this.showDeleteConfirmation.set(true);
   }
 
@@ -98,25 +98,25 @@ export class MisRecetasPageComponent implements OnInit {
         try {
           const { error } = await this.authService.deleteRecetaImage(imagePath);
           if (error) {
-            console.warn('No se pudo eliminar la imagen de la receta. Se procederá a eliminar la receta de la base de datos.', error);
+            // console.warn('No se pudo eliminar la imagen de la receta. Se procederá a eliminar la receta de la base de datos.', error);
             this.notificationService.show('Advertencia: No se pudo eliminar el archivo de imagen.', 'error');
           } else {
             // console.log('Imagen de receta eliminada con éxito del storage.');
           }
         } catch (e) {
-          console.error('Excepción al intentar eliminar la imagen de la receta:', e);
+          // console.error('Excepción al intentar eliminar la imagen de la receta:', e);
         }
       }
     }
 
-    console.log(`Eliminando receta de la base de datos: ${receta.idReceta}`);
+    // console.log(`Eliminando receta de la base de datos: ${receta.idReceta}`);
     this.recetaService.deleteReceta(receta.idReceta.toString()).subscribe({
       next: () => {
         this.recetas.update(recetas => recetas.filter(r => r.idReceta !== receta.idReceta));
         this.notificationService.show('Receta eliminada con éxito', 'success');
       },
       error: (error: HttpErrorResponse | Error) => {
-        console.error('Error al eliminar la receta:', error);
+        // console.error('Error al eliminar la receta:', error);s
         const errorMessage = error instanceof Error ? error.message : 'Error del servidor.';
         this.notificationService.show(`Error al eliminar: ${errorMessage}`, 'error');
         this.isLoading.set(false);

@@ -21,7 +21,7 @@ export class ListaComprasService {
   // }
 
   private handleError(error: HttpErrorResponse) {
-    console.error('Ocurrió un error en el servicio de ListaCompras:', error);
+    // console.error('Ocurrió un error en el servicio de ListaCompras:', error);
     return throwError(() => new Error('Error en ListaComprasService: ' + error.message));
   }
 }

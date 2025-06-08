@@ -48,7 +48,7 @@ export class RecipeListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error: Error) => {
-        console.error('Error al cargar recetas:', error);
+        // console.error('Error al cargar recetas:', error);
         this.errorMensaje.set(`No se pudieron cargar las recetas. ${error.message}`);
         this.isLoading.set(false);
       },
@@ -62,6 +62,6 @@ export class RecipeListComponent implements OnInit {
   // La lógica de onToggleFavoritoReceta se mantiene igual, aunque necesitaría
   // una implementación en el servicio si quieres persistir los favoritos.
   onToggleFavoritoReceta(event: { id: string | number; esFavorito: boolean }): void {
-    console.log('Toggle favorito (sin implementar en backend):', event);
+    // console.log('Toggle favorito (sin implementar en backend):', event);
   }
 }
