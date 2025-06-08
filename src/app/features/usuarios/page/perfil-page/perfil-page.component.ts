@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { PerfilUsuarioService } from '../../services/perfil-usuario.service';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { PerfilUsuario } from '../../models/perfil-usuario.model';
+import { PerfilUsuario, UpdatePerfilPayload } from '../../models/perfil-usuario.model';
 import { AvatarComponent } from '../../components/avatar/avatar.component';
 import { NotificationService } from '../../../../shared/services/notification.service';
 import { ConfirmationDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
@@ -60,7 +60,7 @@ export class PerfilPageComponent implements OnInit {
       next: (data) => {
         this.perfil.set(data);
         this.perfilForm.patchValue({ nombre: data.nombre, email: data.email });
-        this.authService.updateProfileData(data);
+        this.authService.updateProfileData({ nombre: data.nombre, fotoPerfil: data.fotoPerfil });
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -73,27 +73,56 @@ export class PerfilPageComponent implements OnInit {
   async onAvatarUpload(file: File): Promise<void> {
     this.clearMessages();
     this.isLoading.set(true);
+
     const userId = this.authService.currentUser()?.id;
     if (!userId) {
         this.showError('No se pudo identificar al usuario para la actualización.');
         this.isLoading.set(false);
         return;
     }
-    const oldAvatarUrl = this.perfil()?.fotoPerfil;
+
     try {
+      const oldAvatarUrl = this.authService.profileAvatarUrl();
       if (oldAvatarUrl) {
         const oldPath = this.authService.getPathFromUrl(oldAvatarUrl, 'avatars');
         if (oldPath) {
           await this.authService.deleteAvatar(oldPath);
         }
       }
-      const { path, error: uploadError } = await this.authService.uploadAvatar(file);
-      if (uploadError || !path) throw new Error(uploadError?.message || 'Error al subir el avatar.');
-      this.authService.loadUserProfile();
-      this.showSuccess('¡Avatar actualizado con éxito!');
+
+      const { path: newPath, error: uploadError } = await this.authService.uploadAvatar(file);
+      if (uploadError || !newPath) {
+        throw new Error(uploadError?.message || 'Error al subir el nuevo avatar.');
+      }
+
+      const newPublicUrl = this.authService.getAvatarPublicUrl(newPath);
+      if (!newPublicUrl) {
+        throw new Error('No se pudo obtener la URL pública del nuevo avatar.');
+      }
+
+      const nombreActualDelForm = this.perfilForm.value.nombre as string;
+      const payload: UpdatePerfilPayload = {
+        nombre: nombreActualDelForm,
+        fotoPerfil: newPublicUrl
+      };
+
+      this.perfilService.updatePerfil(userId, payload).subscribe({
+          next: () => {
+              this.authService.updateProfileData({
+                  nombre: nombreActualDelForm,
+                  fotoPerfil: newPublicUrl
+              });
+              this.showSuccess('¡Perfil y avatar actualizados con éxito!');
+              this.isLoading.set(false);
+          },
+          error: (dbError) => {
+              this.showError(dbError.message || 'Error al guardar los cambios en la base de datos.');
+              this.isLoading.set(false);
+          }
+      });
+
     } catch (e: any) {
       this.showError(e.message);
-    } finally {
       this.isLoading.set(false);
     }
   }
@@ -102,6 +131,7 @@ export class PerfilPageComponent implements OnInit {
     if (this.perfilForm.invalid) return;
     this.clearMessages();
     this.isLoading.set(true);
+
     const userId = this.authService.currentUser()?.id;
     if (!userId) {
         this.showError('No se pudo identificar al usuario para la actualización.');
@@ -109,15 +139,19 @@ export class PerfilPageComponent implements OnInit {
         return;
     }
     const nombre = this.perfilForm.value.nombre as string;
-    try {
-      await this.perfilService.updatePerfil(userId, { nombre}).toPromise();
-      this.authService.loadUserProfile();
-      this.showSuccess('Perfil actualizado con éxito.');
-    } catch (e: any) {
-      this.showError(e.message || 'No se pudo actualizar el perfil.');
-    } finally {
-      this.isLoading.set(false);
-    }
+    const payload: UpdatePerfilPayload = { nombre };
+
+    this.perfilService.updatePerfil(userId, payload).subscribe({
+        next: () => {
+            this.authService.updateProfileData({ nombre });
+            this.showSuccess('Perfil actualizado con éxito.');
+            this.isLoading.set(false);
+        },
+        error: (e: any) => {
+            this.showError(e.message || 'No se pudo actualizar el perfil.');
+            this.isLoading.set(false);
+        }
+    });
   }
 
   async onUpdatePassword(): Promise<void> {
