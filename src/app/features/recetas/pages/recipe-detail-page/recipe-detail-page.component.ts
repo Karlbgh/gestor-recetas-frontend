@@ -98,6 +98,16 @@ export class RecipeDetailPageComponent implements OnInit {
     };
   }
 
+  getWhatsAppShareUrl(): string {
+    const recetaActual = this.receta();
+    if (!recetaActual) {
+      return '';
+    }
+
+    const text = `¡Mira esta deliciosa receta de "${recetaActual.nombre}" que encontré en GestorRecetas! ${window.location.href}`;
+    return `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  }
+
   navigateToRecetas(): void {
     this.router.navigate(['/recetas']);
   }
