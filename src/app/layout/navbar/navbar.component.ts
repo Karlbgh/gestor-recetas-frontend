@@ -1,5 +1,3 @@
-// src/app/layout/navbar/navbar.component.ts
-
 import { Component, inject, signal, ChangeDetectionStrategy, HostListener, ElementRef } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';

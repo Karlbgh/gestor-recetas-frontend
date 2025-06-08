@@ -45,12 +45,11 @@ export class LoginFormComponent {
       const { user, session, error } = await this.authService.loginWithEmail(email, password);
 
       if (error) {
-        // Traducir errores a mensajes amigables
         if (error.message === 'Invalid login credentials') {
           this.errorMessage.set('Correo electrónico o contraseña incorrectos.');
         } else if (error.message.toLowerCase().includes('email not confirmed')) {
           this.errorMessage.set('Por favor, confirma tu correo electrónico antes de iniciar sesión.');
-        } else if (error.message === 'Esta cuenta ha sido desactivada.') { // <-- MANEJAR EL NUEVO ERROR
+        } else if (error.message === 'Esta cuenta ha sido desactivada.') {
           this.errorMessage.set('Tu cuenta ha sido desactivada. Contacta con el soporte.');
         }
         else {
@@ -58,7 +57,7 @@ export class LoginFormComponent {
         }
         // console.error('Error en el componente de login:', error);
       } else if (user && session) {
-        // La redirección y actualización de estado ya la maneja el onAuthStateChange del servicio
+
       } else {
         this.errorMessage.set('Respuesta inesperada del servidor de autenticación.');
       }

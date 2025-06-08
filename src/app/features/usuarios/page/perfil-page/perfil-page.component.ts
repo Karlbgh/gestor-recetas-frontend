@@ -1,4 +1,3 @@
-// src/app/features/usuarios/page/perfil-page/perfil-page.component.ts
 import { Component, OnInit, inject, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -16,7 +15,7 @@ import { ConfirmationDialogComponent } from '../../../../shared/components/confi
     CommonModule,
     ReactiveFormsModule,
     AvatarComponent,
-    ConfirmationDialogComponent // <-- Añadir aquí
+    ConfirmationDialogComponent
   ],
   templateUrl: './perfil-page.component.html',
   styleUrls: ['./perfil-page.component.scss']
@@ -25,14 +24,13 @@ export class PerfilPageComponent implements OnInit {
   private fb = inject(FormBuilder);
   private perfilService = inject(PerfilUsuarioService);
   private authService = inject(AuthService);
-  private notificationService = inject(NotificationService); // <-- Inyectar
+  private notificationService = inject(NotificationService);
 
   perfil: WritableSignal<PerfilUsuario | null> = signal(null);
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
-  // Signal para el diálogo de confirmación
   showDeleteConfirmation = signal(false);
 
   perfilForm = this.fb.group({
@@ -51,7 +49,6 @@ export class PerfilPageComponent implements OnInit {
   }
 
   cargarPerfil(): void {
-    // ... (sin cambios)
     this.isLoading.set(true);
     const idUser = this.authService.currentUser()?.id;
     if (!idUser) {
@@ -74,7 +71,6 @@ export class PerfilPageComponent implements OnInit {
   }
 
   async onAvatarUpload(file: File): Promise<void> {
-    // ... (sin cambios)
     this.clearMessages();
     this.isLoading.set(true);
     const userId = this.authService.currentUser()?.id;
@@ -103,7 +99,6 @@ export class PerfilPageComponent implements OnInit {
   }
 
   async onUpdatePerfil(): Promise<void> {
-    // ... (sin cambios)
     if (this.perfilForm.invalid) return;
     this.clearMessages();
     this.isLoading.set(true);
@@ -126,7 +121,6 @@ export class PerfilPageComponent implements OnInit {
   }
 
   async onUpdatePassword(): Promise<void> {
-    // ... (sin cambios)
     if (this.passwordForm.invalid) return;
     this.clearMessages();
     this.isLoading.set(true);
@@ -143,26 +137,15 @@ export class PerfilPageComponent implements OnInit {
     }
   }
 
-  // --- MÉTODOS NUEVOS PARA ELIMINAR CUENTA ---
-
-  /**
-   * Muestra el diálogo de confirmación para eliminar la cuenta.
-   */
   onDeleteAccount(): void {
     this.clearMessages();
     this.showDeleteConfirmation.set(true);
   }
 
-  /**
-   * Oculta el diálogo de confirmación.
-   */
   cancelDeleteAccount(): void {
     this.showDeleteConfirmation.set(false);
   }
 
-  /**
-   * Procede con la eliminación de la cuenta tras la confirmación.
-   */
   confirmDeleteAccount(): void {
     this.showDeleteConfirmation.set(false);
     this.isLoading.set(true);
@@ -177,7 +160,7 @@ export class PerfilPageComponent implements OnInit {
     this.perfilService.deletePerfil(userId).subscribe({
       next: async () => {
         this.notificationService.show('Tu cuenta ha sido eliminada con éxito.', 'success');
-        await this.authService.logout(); // Cierra sesión y redirige al inicio
+        await this.authService.logout();
       },
       error: (err) => {
         this.showError(err.message || 'No se pudo eliminar la cuenta.');

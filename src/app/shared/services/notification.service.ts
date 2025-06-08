@@ -20,6 +20,6 @@ export class NotificationService {
     this.notification.set({ message, type });
     setTimeout(() => {
       this.notification.set(null);
-    }, 4000); // La notificación desaparecerá después de 4 segundos
+    }, 4000);
   }
 }

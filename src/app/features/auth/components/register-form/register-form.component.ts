@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthService } from '../../../../core/auth/auth.service';
 
-// Validador personalizado para confirmar que las contraseñas coinciden
+
 export function passwordMatchValidator(controlName: string, matchingControlName: string): ValidatorFn {
   return (formGroup: AbstractControl): ValidationErrors | null => {
     const control = formGroup.get(controlName);
@@ -45,7 +45,6 @@ export class RegisterFormComponent {
     confirmPassword: ['', [Validators.required]]
   }, { validators: passwordMatchValidator('password', 'confirmPassword') });
 
-  // Señales para un feedback de UI claro y reactivo
   isLoading: WritableSignal<boolean> = signal(false);
   errorMessage: WritableSignal<string | null> = signal(null);
   successMessage: WritableSignal<string | null> = signal(null);

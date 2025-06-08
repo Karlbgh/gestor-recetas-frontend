@@ -6,7 +6,7 @@ import { PerfilUsuarioService } from '../../features/usuarios/services/perfil-us
 import { PerfilUsuario } from '../../features/usuarios/models/perfil-usuario.model';
 import { firstValueFrom } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http'; // <-- AÑADIR ESTA IMPORTACIÓN
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'

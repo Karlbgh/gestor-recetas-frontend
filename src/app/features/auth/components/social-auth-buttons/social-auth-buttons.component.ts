@@ -31,16 +31,11 @@ export class SocialAuthButtonsComponent {
       }
 
       await this.authService.signInWithGoogle();
-      // No es necesario hacer nada más aquí después de la llamada,
-      // Supabase gestiona la redirección. Si la redirección ocurre,
-      // este componente podría ser destruido y recreado.
-      // Si signInWithGoogle lanza un error antes de la redirección, se captura abajo.
+
     } catch (error: any) {
       // console.error('Error al intentar iniciar sesión con Google desde el componente:', error);
       this.errorMessageGoogle.set(error.message || 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.');
       this.isLoadingGoogle.set(false);
     }
-    // isLoadingGoogle podría no necesitar ser seteado a false aquí si la redirección siempre ocurre,
-    // pero es bueno tenerlo en caso de un error que no redirija.
   }
 }

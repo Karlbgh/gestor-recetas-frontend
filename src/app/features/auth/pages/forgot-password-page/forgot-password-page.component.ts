@@ -16,20 +16,14 @@ export class ForgotPasswordPageComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
 
-  // Formulario reactivo para capturar el email
   forgotPasswordForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
   });
 
-  // Signals para gestionar el estado de la UI
   isLoading: WritableSignal<boolean> = signal(false);
   errorMessage: WritableSignal<string | null> = signal(null);
   successMessage: WritableSignal<string | null> = signal(null);
 
-  /**
-   * Se ejecuta al enviar el formulario.
-   * Valida el formulario y llama al servicio de autenticación para enviar el email de recuperación.
-   */
   async onSubmit(): Promise<void> {
     if (this.forgotPasswordForm.invalid) {
       this.forgotPasswordForm.markAllAsTouched();

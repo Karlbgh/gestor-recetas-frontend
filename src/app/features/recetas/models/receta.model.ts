@@ -35,8 +35,6 @@ export interface Receta {
   azuacaresTotales?: number;
   sodioTotal?: number;
   creatorId?: number | string;
-
-  // --- Campos para la vista de detalle ---
   ingredientes?: RecetaIngrediente[];
   preparacion?: string;
   tiempoPreparacion?: number;

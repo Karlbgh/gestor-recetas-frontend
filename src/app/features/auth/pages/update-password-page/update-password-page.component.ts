@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { FooterComponent } from "../../../../layout/footer/footer.component";
 
-// Validador para confirmar que las contraseñas coinciden
 export function passwordMatchValidator(controlName: string, matchingControlName: string): ValidatorFn {
   return (formGroup: AbstractControl): ValidationErrors | null => {
     const control = formGroup.get(controlName);
@@ -38,13 +37,13 @@ export class UpdatePasswordPageComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  // Formulario para la nueva contraseña
+
   updatePasswordForm = this.fb.group({
     password: ['', [Validators.required, Validators.minLength(6)]],
     confirmPassword: ['', Validators.required]
   }, { validators: passwordMatchValidator('password', 'confirmPassword') });
 
-  // Signals para el estado de la UI
+
   isLoading: WritableSignal<boolean> = signal(false);
   errorMessage: WritableSignal<string | null> = signal(null);
   successMessage: WritableSignal<string | null> = signal(null);
@@ -52,8 +51,7 @@ export class UpdatePasswordPageComponent implements OnInit {
   recoveryEventOccurred = this.authService.recoveryEventOccurred;
 
   ngOnInit(): void {
-    // Escuchamos el evento de recuperación. Si el usuario llega aquí sin
-    // el token correcto, el servicio no emitirá el evento.
+
     if (!this.recoveryEventOccurred()) {
        this.errorMessage.set("Token de recuperación inválido o expirado. Por favor, solicita un nuevo enlace.");
     }
@@ -95,7 +93,7 @@ export class UpdatePasswordPageComponent implements OnInit {
     }
   }
 
-  // Getters para fácil acceso en la plantilla
+
   get password() { return this.updatePasswordForm.get('password'); }
   get confirmPassword() { return this.updatePasswordForm.get('confirmPassword'); }
 }

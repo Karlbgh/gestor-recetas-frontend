@@ -28,7 +28,6 @@ export class MisRecetasPageComponent implements OnInit {
   isLoading = signal(true);
   errorMensaje = signal<string | null>(null);
 
-  // Signals para el diálogo de confirmación
   showDeleteConfirmation = signal(false);
   recetaAEliminar = signal<Receta | null>(null);
 

@@ -19,26 +19,23 @@ import { of } from 'rxjs';
 export class RecipeListComponent implements OnInit {
   private recetaService = inject(RecetaService);
   private router = inject(Router);
-  private route = inject(ActivatedRoute); // Inyectamos ActivatedRoute
+  private route = inject(ActivatedRoute);
 
   recetas: WritableSignal<Receta[]> = signal([]);
   isLoading: WritableSignal<boolean> = signal(true);
   errorMensaje: WritableSignal<string | null> = signal(null);
 
   ngOnInit(): void {
-    // Escuchamos cambios en los parámetros de la URL
     this.route.queryParamMap.pipe(
       switchMap(params => {
         const searchTerm = params.get('search');
         this.isLoading.set(true);
         this.errorMensaje.set(null);
-        this.recetas.set([]); // Limpiamos las recetas anteriores
+        this.recetas.set([]);
 
         if (searchTerm) {
-          // Si hay un término de búsqueda, llamamos a searchRecetas
           return this.recetaService.searchRecetas(searchTerm);
         } else {
-          // Si no, llamamos a getRecetas para obtener todas
           return this.recetaService.getRecetas();
         }
       })
@@ -59,8 +56,6 @@ export class RecipeListComponent implements OnInit {
     this.router.navigate(['/recetas', recetaId]);
   }
 
-  // La lógica de onToggleFavoritoReceta se mantiene igual, aunque necesitaría
-  // una implementación en el servicio si quieres persistir los favoritos.
   onToggleFavoritoReceta(event: { id: string | number; esFavorito: boolean }): void {
     // console.log('Toggle favorito (sin implementar en backend):', event);
   }

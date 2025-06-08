@@ -28,13 +28,6 @@ export class RecipeCardComponent {
     this.verDetalle.emit(this.receta.idReceta);
   }
 
-  // onToggleFavorito(event: MouseEvent): void {
-  //   event.stopPropagation(); // Prevenir que el click se propague, ej. si la tarjeta entera es clickeable
-  //   const nuevoEstadoFavorito = !this.receta.esFavorito;
-  //   this.toggleFavorito.emit({ id: this.receta.id, esFavorito: nuevoEstadoFavorito });
-  // }
-
-  // Para mostrar la puntuación con estrellas (simplificado)
   getPuntuacionEstrellas(puntuacion?: number): string {
     if (puntuacion === undefined || puntuacion === null || puntuacion < 0 || puntuacion > 5) {
       return 'Sin valorar';

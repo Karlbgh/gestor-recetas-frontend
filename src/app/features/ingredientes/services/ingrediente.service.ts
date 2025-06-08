@@ -1,4 +1,3 @@
-// src/app/features/ingredientes/services/ingrediente.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
@@ -11,18 +10,12 @@ import { Ingrediente } from '../models/ingrediente.model';
 })
 export class IngredienteService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/Ingredientes`; //
+  private apiUrl = `${environment.apiUrl}/Ingredientes`;
 
-  /**
-   * Obtiene la lista COMPLETA de ingredientes desde el backend.
-   * Llama al endpoint GET /api/Ingredientes.
-   */
   getIngredientes(): Observable<Ingrediente[]> {
     return this.http.get<Ingrediente[]>(this.apiUrl)
       .pipe(catchError(this.handleError));
   }
-
-  // El método searchIngredientes ya no es necesario, ya que filtraremos en el cliente.
 
   private handleError(error: HttpErrorResponse) {
     // console.error('Ocurrió un error en el servicio de Ingredientes:', error);

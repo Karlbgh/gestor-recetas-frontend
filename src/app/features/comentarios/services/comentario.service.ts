@@ -10,11 +10,11 @@ import { Comentario } from '../models/comentario.model';
 })
 export class ComentarioService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/Comentarios`; // Verifica el endpoint
+  private apiUrl = `${environment.apiUrl}/Comentarios`;
 
   getComentariosPorReceta(recetaId: string): Observable<Comentario[]> {
     const params = new HttpParams().set('recetaId', recetaId);
-    return this.http.get<Comentario[]>(this.apiUrl, { params }) // Asumiendo que tu API filtra por recetaId
+    return this.http.get<Comentario[]>(this.apiUrl, { params })
       .pipe(catchError(this.handleError));
   }
 
@@ -23,7 +23,6 @@ export class ComentarioService {
       .pipe(catchError(this.handleError));
   }
 
-  // updateComentario, deleteComentario si son necesarios...
 
   private handleError(error: HttpErrorResponse) {
     // console.error('Ocurrió un error en el servicio de Comentarios:', error);

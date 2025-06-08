@@ -10,15 +10,7 @@ import { ListaCompra } from '../models/lista-compra.model';
 })
 export class ListaComprasService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/ListasCompras`; // Verifica el endpoint
-
-  // Métodos CRUD (getAll, getById, create, update, delete)
-  // ... (similar a RecetaService, usando el modelo ListaCompra)
-
-  // generarListaDesdePlanificador(usuarioId: string, fechaInicio: Date, fechaFin: Date): Observable<ListaCompra> {
-  //   return this.http.post<ListaCompra>(`${this.apiUrl}/generar-desde-planificador`, { usuarioId, fechaInicio, fechaFin })
-  //     .pipe(catchError(this.handleError));
-  // }
+  private apiUrl = `${environment.apiUrl}/ListasCompras`;
 
   private handleError(error: HttpErrorResponse) {
     // console.error('Ocurrió un error en el servicio de ListaCompras:', error);

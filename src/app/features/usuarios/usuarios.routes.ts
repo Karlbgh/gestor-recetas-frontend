@@ -5,14 +5,13 @@ import { PerfilPageComponent } from './page/perfil-page/perfil-page.component';
 export const USUARIOS_ROUTES: Routes = [
   {
     path: '',
-    canActivate: [authGuard], // Proteger todas las rutas de usuario
+    canActivate: [authGuard],
     children: [
       {
         path: 'perfil',
         component: PerfilPageComponent,
         title: 'Mi Perfil | GestorRecetas'
       },
-      // Puedes añadir más rutas de usuario aquí, como 'mis-recetas'
       {
         path: '',
         redirectTo: 'perfil',
