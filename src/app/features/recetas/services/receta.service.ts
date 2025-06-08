@@ -1,106 +1,113 @@
 // src/app/features/recetas/services/receta.service.ts
 
-import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
-import { catchError, tap, delay, map } from 'rxjs/operators';
-import { Receta, RecetaIngrediente, UsuarioSimple } from '../models/receta.model';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, from, throwError, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Receta, RecetaIngrediente } from '../models/receta.model';
 import { environment } from '../../../../environments/environment';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecetaService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/Recetas`; // Endpoint de tu API para recetas
+  private dotnetApiUrl = `${environment.apiUrl}/Recetas`;
 
-  constructor() { }
+  private supabase: SupabaseClient;
+
+  constructor() {
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  }
 
   getRecetas(): Observable<Receta[]> {
-    console.log(`Solicitando recetas desde: ${this.apiUrl}`);
+    console.log(`Solicitando todas las recetas desde Supabase`);
+    const promise = this.supabase
+      .from('receta')
+      .select('*')
+      .order('nombre', { ascending: true });
 
-    return this.http.get<Receta[]>(this.apiUrl).pipe(
-      tap(recetasTransformadas => {
-        console.log('Recetas recibidas y transformadas:', recetasTransformadas);
+    return from(promise).pipe(
+      map(response => {
+        if (response.error) {
+          throw response.error;
+        }
+        // --- CORRECCIÓN AQUÍ ---
+        // Mapeamos 'id' (de Supabase) a 'idReceta' (del modelo de Angular).
+        return response.data.map((item: any) => ({
+          ...item,
+          idReceta: item.id // <--- CAMBIO CLAVE
+        })) as Receta[];
       }),
-      catchError(this.handleError)
+      catchError(this.handleSupabaseError)
     );
   }
 
-  // Obtener una receta por ID de receta
+  searchRecetas(termino: string): Observable<Receta[]> {
+    console.log(`Buscando recetas en Supabase con el término: "${termino}"`);
+    const promise = this.supabase
+      .rpc('search_recipes', { search_term: termino });
+    console.log(`Promesa de búsqueda creada:`, promise);
+    return from(promise).pipe(
+      map(response => {
+        console.log(`Respuesta de búsqueda recibida:`, response);
+        if (response.error) {
+          throw response.error;
+        }
+        // --- CORRECCIÓN AQUÍ ---
+        // Hacemos el mismo mapeo para los resultados de la búsqueda.
+        return response.data.map((item: any) => ({
+          ...item,
+          idReceta: item.id // <--- CAMBIO CLAVE
+        })) as Receta[];
+      }),
+      catchError(this.handleSupabaseError)
+    );
+  }
+
   getRecetaById(id: string): Observable<Receta> {
-    return this.http.get<Receta>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+    return this.http.get<Receta>(`${this.dotnetApiUrl}/${id}`)
+      .pipe(catchError(this.handleHttpError));
   }
 
-  /**
-   * Obtiene los ingredientes para una receta específica.
-   * @param recetaId El ID de la receta.
-   * @returns Un Observable con un array de RecetaIngrediente.
-   */
   getIngredientesPorReceta(recetaId: string): Observable<RecetaIngrediente[]> {
-    return this.http.get<RecetaIngrediente[]>(`${this.apiUrl}/${recetaId}/ingredientes`)
-      .pipe(catchError(this.handleError));
+    return this.http.get<RecetaIngrediente[]>(`${this.dotnetApiUrl}/${recetaId}/ingredientes`)
+      .pipe(catchError(this.handleHttpError));
   }
 
-  /**
-   * Obtiene todas las recetas creadas por un usuario específico.
-   * @param usuarioId El ID del usuario.
-   * @returns Un Observable con un array de Recetas.
-   */
   getRecetasByUsuario(usuarioId: string): Observable<Receta[]> {
-    // Se utiliza el endpoint GET /api/Recetas/{id}, donde {id} es el ID del usuario.
-    return this.http.get<Receta[]>(`${this.apiUrl}/usuario/${usuarioId}`)
-      .pipe(catchError(this.handleError));
+    return this.http.get<Receta[]>(`${this.dotnetApiUrl}/usuario/${usuarioId}`)
+      .pipe(catchError(this.handleHttpError));
   }
 
-  // Crear una nueva receta
   createReceta(receta: Receta): Observable<Receta> {
-    return this.http.post<Receta>(this.apiUrl, receta)
-      .pipe(catchError(this.handleError));
+    return this.http.post<Receta>(this.dotnetApiUrl, receta)
+      .pipe(catchError(this.handleHttpError));
   }
 
-  // Actualizar una receta existente
-  updateReceta(id: string, receta: Receta): Observable<void> { // <-- CAMBIO 1: El tipo de retorno ahora es Observable<void>
-    const urlFinal = `${this.apiUrl}/${id}`;
-    console.log(`Actualizando receta en: ${urlFinal}`);
-    console.log('Datos de la receta a actualizar:', receta);
-    // <-- CAMBIO 2: No se especifica un tipo genérico en put(), o se usa <void>
-    return this.http.put<void>(urlFinal, receta)
-      .pipe(catchError(this.handleError));
+  updateReceta(id: string, receta: Receta): Observable<void> {
+    return this.http.put<void>(`${this.dotnetApiUrl}/${id}`, receta)
+      .pipe(catchError(this.handleHttpError));
   }
 
-  // Eliminar una receta
   deleteReceta(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+    return this.http.delete<void>(`${this.dotnetApiUrl}/${id}`)
+      .pipe(catchError(this.handleHttpError));
   }
 
-  // Funcionalidades de Búsqueda y Filtrado (Ejemplo)
-  // buscarRecetas(termino: string, dificultad?: string, ...): Observable<Receta[]> {
-  //   let params = new HttpParams().set('nombre', termino);
-  //   if (dificultad) {
-  //     params = params.set('dificultad', dificultad);
-  //   }
-  //   // ... otros parámetros
-  //   return this.http.get<Receta[]>(`${this.apiUrl}/buscar`, { params }) // Asumiendo un endpoint /buscar
-  //     .pipe(catchError(this.handleError));
-  // }
+  private handleSupabaseError(error: any) {
+    console.error('Ocurrió un error en la llamada a Supabase:', error);
+    return throwError(() => new Error(error.message || 'Error desconocido del servidor de Supabase.'));
+  }
 
-  // Manejo de errores básico
-  private handleError(error: HttpErrorResponse) {
-    console.error('Ocurrió un error en el servicio de Recetas:', error);
+  private handleHttpError(error: HttpErrorResponse) {
+    console.error('Ocurrió un error en el servicio HTTP de Recetas:', error);
     let errorMessage = 'Algo salió mal; por favor, inténtalo de nuevo más tarde.';
     if (error.error instanceof ErrorEvent) {
       errorMessage = `Error: ${error.error.message}`;
     } else {
       errorMessage = `Error Código: ${error.status}\nMensaje: ${error.message}`;
-      if (error.error && typeof error.error === 'string') {
-        errorMessage += `\nDetalle: ${error.error}`;
-      } else if (error.error && error.error.errors) {
-        const errors = Object.values(error.error.errors).flat();
-        errorMessage += `\nDetalles: ${errors.join(', ')}`;
-      }
     }
     return throwError(() => new Error(errorMessage));
   }
