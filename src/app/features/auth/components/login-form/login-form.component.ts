@@ -38,7 +38,6 @@ export class LoginFormComponent {
     const { email, password } = this.loginForm.value;
 
     try {
-      // Aseguramos que email y password no sean nulos/undefined antes de la llamada
       if (!email || !password) {
         throw new Error('Email y contraseña son requeridos.');
       }
@@ -46,24 +45,21 @@ export class LoginFormComponent {
       const { user, session, error } = await this.authService.loginWithEmail(email, password);
 
       if (error) {
-        // Traducir errores comunes de Supabase a mensajes amigables
+        // Traducir errores a mensajes amigables
         if (error.message === 'Invalid login credentials') {
           this.errorMessage.set('Correo electrónico o contraseña incorrectos.');
         } else if (error.message.toLowerCase().includes('email not confirmed')) {
           this.errorMessage.set('Por favor, confirma tu correo electrónico antes de iniciar sesión.');
+        } else if (error.message === 'Esta cuenta ha sido desactivada.') { // <-- MANEJAR EL NUEVO ERROR
+          this.errorMessage.set('Tu cuenta ha sido desactivada. Contacta con el soporte.');
         }
         else {
           this.errorMessage.set(`Error: ${error.message || 'No se pudo iniciar sesión. Inténtalo de nuevo.'}`);
         }
         console.error('Error en el componente de login:', error);
       } else if (user && session) {
-        //console.log('Login exitoso desde el componente:', user);
-        // AuthService.onAuthStateChange se encargará de la redirección principal
-        // pero si necesitas una acción específica aquí, puedes hacerla.
-        // Ejemplo: this.router.navigate(['/dashboard']);
-        // Si onAuthStateChange ya redirige a '/', no es necesario hacerlo aquí.
+        // La redirección y actualización de estado ya la maneja el onAuthStateChange del servicio
       } else {
-        // Caso inesperado donde no hay error pero tampoco usuario/sesión
         this.errorMessage.set('Respuesta inesperada del servidor de autenticación.');
       }
     } catch (e: any) {

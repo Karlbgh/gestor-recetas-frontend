@@ -2,17 +2,22 @@
 import { Component, OnInit, inject, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-
 import { PerfilUsuarioService } from '../../services/perfil-usuario.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { PerfilUsuario } from '../../models/perfil-usuario.model';
-
 import { AvatarComponent } from '../../components/avatar/avatar.component';
+import { NotificationService } from '../../../../shared/services/notification.service';
+import { ConfirmationDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-perfil-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AvatarComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    AvatarComponent,
+    ConfirmationDialogComponent // <-- Añadir aquí
+  ],
   templateUrl: './perfil-page.component.html',
   styleUrls: ['./perfil-page.component.scss']
 })
@@ -20,11 +25,15 @@ export class PerfilPageComponent implements OnInit {
   private fb = inject(FormBuilder);
   private perfilService = inject(PerfilUsuarioService);
   private authService = inject(AuthService);
+  private notificationService = inject(NotificationService); // <-- Inyectar
 
   perfil: WritableSignal<PerfilUsuario | null> = signal(null);
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
+
+  // Signal para el diálogo de confirmación
+  showDeleteConfirmation = signal(false);
 
   perfilForm = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
@@ -42,23 +51,18 @@ export class PerfilPageComponent implements OnInit {
   }
 
   cargarPerfil(): void {
+    // ... (sin cambios)
     this.isLoading.set(true);
-
     const idUser = this.authService.currentUser()?.id;
     if (!idUser) {
       this.errorMessage.set('No se pudo identificar al usuario.');
       this.isLoading.set(false);
       return;
     }
-
     this.perfilService.getPerfil(idUser).subscribe({
       next: (data) => {
         this.perfil.set(data);
-        this.perfilForm.patchValue({
-          nombre: data.nombre,
-          email: data.email
-        });
-
+        this.perfilForm.patchValue({ nombre: data.nombre, email: data.email });
         this.authService.updateProfileData(data);
         this.isLoading.set(false);
       },
@@ -70,32 +74,27 @@ export class PerfilPageComponent implements OnInit {
   }
 
   async onAvatarUpload(file: File): Promise<void> {
+    // ... (sin cambios)
     this.clearMessages();
     this.isLoading.set(true);
-
     const userId = this.authService.currentUser()?.id;
     if (!userId) {
         this.showError('No se pudo identificar al usuario para la actualización.');
         this.isLoading.set(false);
         return;
     }
-
     const oldAvatarUrl = this.perfil()?.fotoPerfil;
-    //console.log(`Avatar antiguo: ${oldAvatarUrl}`);
     try {
       if (oldAvatarUrl) {
         const oldPath = this.authService.getPathFromUrl(oldAvatarUrl, 'avatars');
         if (oldPath) {
-          //console.log(`Intentando eliminar el avatar anterior en la ruta: ${oldPath}`);
           await this.authService.deleteAvatar(oldPath);
         }
       }
       const { path, error: uploadError } = await this.authService.uploadAvatar(file);
       if (uploadError || !path) throw new Error(uploadError?.message || 'Error al subir el avatar.');
-
       this.authService.loadUserProfile();
       this.showSuccess('¡Avatar actualizado con éxito!');
-
     } catch (e: any) {
       this.showError(e.message);
     } finally {
@@ -104,24 +103,21 @@ export class PerfilPageComponent implements OnInit {
   }
 
   async onUpdatePerfil(): Promise<void> {
+    // ... (sin cambios)
     if (this.perfilForm.invalid) return;
     this.clearMessages();
     this.isLoading.set(true);
-
     const userId = this.authService.currentUser()?.id;
     if (!userId) {
         this.showError('No se pudo identificar al usuario para la actualización.');
         this.isLoading.set(false);
         return;
     }
-
     const nombre = this.perfilForm.value.nombre as string;
-    //(`Actualizando perfil de usuario con nombre: ${nombre}`);
     try {
       await this.perfilService.updatePerfil(userId, { nombre}).toPromise();
       this.authService.loadUserProfile();
       this.showSuccess('Perfil actualizado con éxito.');
-
     } catch (e: any) {
       this.showError(e.message || 'No se pudo actualizar el perfil.');
     } finally {
@@ -130,24 +126,67 @@ export class PerfilPageComponent implements OnInit {
   }
 
   async onUpdatePassword(): Promise<void> {
+    // ... (sin cambios)
     if (this.passwordForm.invalid) return;
     this.clearMessages();
     this.isLoading.set(true);
-
     const newPassword = this.passwordForm.value.newPassword as string;
-
     try {
       const { error } = await this.authService.updateUserPassword(newPassword);
       if (error) throw error;
-
       this.showSuccess('Contraseña actualizada correctamente.');
       this.passwordForm.reset();
-
     } catch (e: any) {
       this.showError(e.message || 'No se pudo actualizar la contraseña.');
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  // --- MÉTODOS NUEVOS PARA ELIMINAR CUENTA ---
+
+  /**
+   * Muestra el diálogo de confirmación para eliminar la cuenta.
+   */
+  onDeleteAccount(): void {
+    this.clearMessages();
+    this.showDeleteConfirmation.set(true);
+  }
+
+  /**
+   * Oculta el diálogo de confirmación.
+   */
+  cancelDeleteAccount(): void {
+    this.showDeleteConfirmation.set(false);
+  }
+
+  /**
+   * Procede con la eliminación de la cuenta tras la confirmación.
+   */
+  confirmDeleteAccount(): void {
+    this.showDeleteConfirmation.set(false);
+    this.isLoading.set(true);
+
+    const userId = this.authService.currentUser()?.id;
+    if (!userId) {
+      this.showError('No se pudo identificar al usuario para eliminar la cuenta.');
+      this.isLoading.set(false);
+      return;
+    }
+
+    this.perfilService.deletePerfil(userId).subscribe({
+      next: async () => {
+        this.notificationService.show('Tu cuenta ha sido eliminada con éxito.', 'success');
+        await this.authService.logout(); // Cierra sesión y redirige al inicio
+      },
+      error: (err) => {
+        this.showError(err.message || 'No se pudo eliminar la cuenta.');
+        this.isLoading.set(false);
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      }
+    });
   }
 
   private showSuccess(message: string): void {

@@ -6,6 +6,7 @@ export interface PerfilUsuario {
   email: string;
   rol?: RolUsuario;
   fotoPerfil?: string;
+  isDeleted?: boolean;
 }
 
 export interface UpdatePerfilPayload {
