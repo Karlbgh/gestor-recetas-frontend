@@ -3,32 +3,29 @@ import { Receta } from '../../recetas/models/receta.model';
 export type TipoComida = 'Desayuno' | 'Almuerzo' | 'Cena' | 'Snack';
 
 export interface PlanComida {
-  id?: string; // ID de esta entrada específica del planificador
+  id?: string;
   recetaId: string;
-  // receta?: Receta; // Objeto Receta completo si es necesario
-  nombreReceta?: string; // Para mostrar
-  tipoComida: TipoComida; // ej. Desayuno, Almuerzo, Cena
-  // notas?: string;
+  nombreReceta?: string;
+  tipoComida: TipoComida;
 }
 
 export interface PlanificadorDiario {
-  fecha: Date; // El día específico
+  fecha: Date;
   comidas: PlanComida[];
 }
 
-export interface PlanificadorSemanal { // O como lo organices
+export interface PlanificadorSemanal {
   usuarioId: string;
-  semanaDel?: Date; // Lunes de la semana, por ejemplo
+  semanaDel?: Date;
   dias: PlanificadorDiario[];
 }
 
-// Modelo simplificado basado en tu PlanificadorDto.cs
+
 export interface Planificador {
     id?: string;
     usuarioId: string;
     recetaId: string;
-    // receta?: Receta; // Para tener los detalles de la receta
-    nombreReceta?: string; // Denormalizado para facilitar la visualización
-    fechaPlanificada: Date; // Fecha y quizás hora si es relevante
-    tipoComida?: TipoComida; // Desayuno, Almuerzo, Cena
+    nombreReceta?: string;
+    fechaPlanificada: Date;
+    tipoComida?: TipoComida;
 }

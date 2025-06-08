@@ -1,9 +1,9 @@
 export interface Comentario {
   id?: string;
-  recetaId: string; // ID de la receta a la que pertenece
-  usuarioId: string; // ID del usuario que comenta
-  nombreUsuario?: string; // Para mostrar fácilmente, puede venir del backend
+  recetaId: string;
+  usuarioId: string;
+  nombreUsuario?: string;
   texto: string;
-  puntuacion?: number; // ej. 1 a 5 estrellas
+  puntuacion?: number;
   fechaCreacion?: Date;
 }

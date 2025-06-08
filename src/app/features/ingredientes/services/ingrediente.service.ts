@@ -10,13 +10,15 @@ import { Ingrediente } from '../models/ingrediente.model';
 })
 export class IngredienteService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/Ingredientes`; // Verifica el endpoint
+  private apiUrl = `${environment.apiUrl}/Ingredientes`;
 
-  // Métodos CRUD (getAll, getById, create, update, delete)
-  // ... (similar a RecetaService, usando el modelo Ingrediente)
+  getIngredientes(): Observable<Ingrediente[]> {
+    return this.http.get<Ingrediente[]>(this.apiUrl)
+      .pipe(catchError(this.handleError));
+  }
 
   private handleError(error: HttpErrorResponse) {
-    console.error('Ocurrió un error en el servicio de Ingredientes:', error);
+    // console.error('Ocurrió un error en el servicio de Ingredientes:', error);
     return throwError(() => new Error('Error en IngredienteService: ' + error.message));
   }
 }

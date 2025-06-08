@@ -1,39 +1,43 @@
-import { Ingrediente } from '../../ingredientes/models/ingrediente.model'; // Asumiendo que tendrás este modelo
-import { Comentario } from '../../comentarios/models/comentario.model'; // Asumiendo que tendrás este modelo
+import { Ingrediente } from '../../ingredientes/models/ingrediente.model';
+import { Comentario } from '../../comentarios/models/comentario.model';
+import { PerfilUsuario } from '../../usuarios/models/perfil-usuario.model';
 
-export interface Receta {
-  id?: string; // Generalmente los IDs son string o number desde el backend
+export interface UsuarioSimple {
+  id: number | string;
   nombre: string;
-  descripcion?: string;
-  tiempoPreparacion?: number; // En minutos, por ejemplo
-  dificultad?: 'Fácil' | 'Media' | 'Difícil'; // O un enum/string
-  porciones?: number;
-  instrucciones?: string;
-  imagenUrl?: string; // Para la URL de la imagen
-  usuarioId?: string; // O el tipo de ID que uses para el usuario
-
-  // Información Nutricional (calculada o directa)
-  caloriasTotales?: number;
-  grasasTotales?: number;
-  carbohidratosTotales?: number;
-  proteinasTotales?: number;
-
-  // Relaciones
-  ingredientes?: RecetaIngrediente[]; // Lista de ingredientes de la receta
-  comentarios?: Comentario[]; // Comentarios asociados
-
-  // Campos de auditoría (opcional, si los envías desde el backend)
-  // fechaCreacion?: Date;
-  // fechaActualizacion?: Date;
 }
 
-// Interfaz para la relación Receta-Ingrediente, si necesitas detalles específicos
-// como la cantidad del ingrediente EN la receta.
 export interface RecetaIngrediente {
-  ingredienteId: string;
-  // ingrediente?: Ingrediente; // Podrías anidar el objeto Ingrediente completo
-  nombreIngrediente?: string; // O solo el nombre para visualización rápida
+  idIngrediente: number;
+  nombre: string;
   cantidad: number;
   unidadMedida: string;
-  // notasAdicionales?: string; // ej. "finamente picado"
+  calorias: number;
+  grasas: number;
+  proteinas: number;
+  carbohidratos: number;
+  azucares: number;
+  sodio: number;
+
+}
+
+export interface Receta {
+  idReceta: number | string;
+  nombre: string;
+  descripcion: string;
+  imagen?: string | null;
+  dificultad: 'Fácil' | 'Media' | 'Difícil';
+  comensales?: number;
+  caloriasTotales?: number;
+  grasasTotales?: number;
+  proteinasTotales?: number;
+  carbohidratosTotales?: number;
+  azuacaresTotales?: number;
+  sodioTotal?: number;
+  creatorId?: number | string;
+  ingredientes?: RecetaIngrediente[];
+  preparacion?: string;
+  tiempoPreparacion?: number;
+  nombreCreador?: string;
+  comentarios?: Comentario[];
 }

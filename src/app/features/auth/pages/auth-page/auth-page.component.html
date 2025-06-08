@@ -1,0 +1,54 @@
+<div class="flex flex-col min-h-screen bg-gray-100">
+  <main class="flex-grow flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white rounded-lg shadow-md p-6 md:p-8">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">
+          @if (showLogin()) {
+            Bienvenido de Nuevo
+          } @else {
+            Crea tu Cuenta
+          }
+        </h1>
+        <p class="text-gray-600">
+          @if (showLogin()) {
+            Inicia sesión para continuar.
+          } @else {
+            Regístrate para empezar a gestionar tus recetas.
+          }
+        </p>
+      </div>
+
+      @if (showLogin()) {
+        <app-login-form />
+      } @else {
+        <app-register-form />
+      }
+
+      <div class="mt-6 text-center">
+        <button (click)="toggleForm()" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
+          @if (showLogin()) {
+            ¿No tienes una cuenta? Regístrate
+          } @else {
+            ¿Ya tienes una cuenta? Inicia Sesión
+          }
+        </button>
+      </div>
+
+      <div class="mt-6">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">
+              O continúa con
+            </span>
+          </div>
+        </div>
+
+        <app-social-auth-buttons class="mt-4" />
+      </div>
+    </div>
+  </main>
+  <app-footer></app-footer>
+</div>
