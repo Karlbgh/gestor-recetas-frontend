@@ -1,5 +1,3 @@
-// src/app/features/recetas/services/receta.service.ts
-
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, from, throwError, of } from 'rxjs';
@@ -22,10 +20,15 @@ export class RecetaService {
   }
 
   getRecetas(): Observable<Receta[]> {
-    console.log(`Solicitando todas las recetas desde Supabase`);
+    console.log(`Solicitando todas las recetas desde Supabase con datos del creador`);
     const promise = this.supabase
       .from('receta')
-      .select('*')
+      .select(`
+        *,
+        perfil_usuario (
+          nombre
+        )
+      `)
       .order('nombre', { ascending: true });
 
     return from(promise).pipe(
@@ -33,11 +36,11 @@ export class RecetaService {
         if (response.error) {
           throw response.error;
         }
-        // --- CORRECCIÓN AQUÍ ---
-        // Mapeamos 'id' (de Supabase) a 'idReceta' (del modelo de Angular).
         return response.data.map((item: any) => ({
           ...item,
-          idReceta: item.id // <--- CAMBIO CLAVE
+          idReceta: item.id,
+          tiempoPreparacion: item.tiempo_preparacion,
+          nombreCreador: item.perfil_usuario?.nombre || 'Anónimo',
         })) as Receta[];
       }),
       catchError(this.handleSupabaseError)
@@ -46,20 +49,18 @@ export class RecetaService {
 
   searchRecetas(termino: string): Observable<Receta[]> {
     console.log(`Buscando recetas en Supabase con el término: "${termino}"`);
-    const promise = this.supabase
-      .rpc('search_recipes', { search_term: termino });
-    console.log(`Promesa de búsqueda creada:`, promise);
+    const promise = this.supabase.rpc('search_recipes', { search_term: termino });
+
     return from(promise).pipe(
       map(response => {
-        console.log(`Respuesta de búsqueda recibida:`, response);
         if (response.error) {
           throw response.error;
         }
-        // --- CORRECCIÓN AQUÍ ---
-        // Hacemos el mismo mapeo para los resultados de la búsqueda.
         return response.data.map((item: any) => ({
           ...item,
-          idReceta: item.id // <--- CAMBIO CLAVE
+          idReceta: item.id,
+          tiempoPreparacion: item.tiempo_preparacion,
+          nombreCreador: item.perfil_usuario?.nombre || 'Anónimo',
         })) as Receta[];
       }),
       catchError(this.handleSupabaseError)
