@@ -1,59 +1,65 @@
-# GestorRecetasFrontend
+# Gestor de Recetas - Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.6.
+Este es el repositorio del frontend para la aplicación **Gestor de Recetas**, una Single Page Application (SPA) desarrollada con Angular 19. La aplicación permite a los usuarios explorar, crear, gestionar y planificar sus recetas de cocina.
 
-## Development server
+## ✨ Características Principales
 
-To start a local development server, run:
+-   **Arquitectura Limpia y Moderna**: Construido con las últimas características de Angular 19, incluyendo componentes `standalone`, `signals` y la nueva sintaxis de `control flow`.
+-   **Interfaz de Usuario con Tailwind CSS**: Estilado moderno y responsivo gracias a Tailwind CSS v4.1.
+-   **Autenticación Completa**: Soporte para registro e inicio de sesión con email/contraseña y proveedores sociales (Google), incluyendo recuperación de contraseña.
+-   **Gestión de Recetas (CRUD)**: Los usuarios autenticados pueden crear, leer, actualizar y eliminar sus propias recetas.
+-   **Búsqueda Avanzada**: Búsqueda de recetas por término en la barra de navegación.
+-   **Gestión de Perfil de Usuario**: Los usuarios pueden actualizar su nombre y foto de perfil (avatar), cambiar su contraseña y eliminar su cuenta.
+-   **Interacción con Backend .NET**: Se comunica con una API RESTful construida con .NET 9 para la persistencia de datos.
 
-```bash
-ng serve
-```
+## Tecnologías Utilizadas
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+-   **Framework**: Angular 19
+-   **Estilos**: Tailwind CSS 4.1 con PostCSS
+-   **Backend como Servicio (BaaS)**: Supabase para autenticación y almacenamiento de imágenes (avatares e imágenes de recetas).
+-   **Editor de Texto Enriquecido**: `ngx-quill` para la descripción de los pasos de preparación de las recetas.
+-   **Despliegue**: Preparado para Vercel.
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 🛠️ Requisitos Previos
 
-```bash
-ng generate component component-name
-```
+Asegúrate de tener instalado lo siguiente en tu sistema:
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+-   **Node.js**: Se recomienda la última versión LTS. Puedes descargarlo desde [nodejs.org](https://nodejs.org/).
+-   **Angular CLI**: Instálalo globalmente si aún no lo tienes.
+    ```bash
+    npm install -g @angular/cli
+    ```
 
-```bash
-ng generate --help
-```
+### Instalación
 
-## Building
+1.  **Clona el repositorio** [https://github.com/Karlbgh/gestor-recetas-frontend](https://github.com/Karlbgh/gestor-recetas-frontend)
+    ```bash
+    git clone https://github.com/Karlbgh/gestor-recetas-frontend.git
+    cd gestor-recetas-frontend
+    ```
 
-To build the project run:
+2.  **Instala las dependencias del proyecto**
+    Este comando leerá el archivo `package.json` e instalará todas las librerías necesarias.
+    ```bash
+    npm install
+    ```
 
-```bash
-ng build
-```
+### Iniciar el Servidor de Desarrollo
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Una vez instaladas las dependencias y configurado el entorno, puedes arrancar la aplicación.
 
-## Running unit tests
+1.  **Ejecuta el servidor de desarrollo de Angular**
+    ```bash
+    ng serve -o
+    ```
+    o, si prefieres usar el script de `package.json`:
+    ```bash
+    npm start
+    ```
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+2.  **Abre tu navegador**
+    El comando anterior abrirá automáticamente tu navegador en `http://localhost:4200/`. La aplicación se recargará automáticamente si realizas cambios en los archivos fuente.
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
